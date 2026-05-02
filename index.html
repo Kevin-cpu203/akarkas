@@ -24,6 +24,8 @@
         select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        
+        /* Hilangkan spinner pada input tonase */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
@@ -47,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Dashboard Rekap -->
+        <!-- Dashboard -->
         <div class="grid grid-cols-2 gap-3 mb-6">
             <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
                 <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Pemasukan</p>
@@ -69,53 +71,54 @@
 
         <!-- Tab Navigasi -->
         <div class="flex space-x-1 mb-4 bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
-            <button id="btn-tab-penjualan" class="flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm">Penjualan</button>
-            <button id="btn-tab-operasional" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors shadow-sm">Operasional</button>
-            <button id="btn-tab-hutang" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors shadow-sm">Utang/Piutang</button>
+            <button id="btn-tab-penjualan" class="flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase shadow-sm">Penjualan</button>
+            <button id="btn-tab-operasional" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700">Operasional</button>
+            <button id="btn-tab-hutang" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700">Utang/Piutang</button>
         </div>
 
         <!-- Area Form Penjualan -->
-        <div id="area-penjualan" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 block transition-colors">
+        <div id="area-penjualan" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 block">
             <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white">Catat Penjualan Melon</h2>
             <form id="form-penjualan" class="space-y-4">
-                <input type="text" id="ket_penj" placeholder="Keterangan / Nama Pembeli" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                <input type="number" id="tonase_penj" placeholder="Tonase Keluar (Kg)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                <input type="number" id="nom_penj" placeholder="Total Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
+                <input type="text" id="ket_penj" placeholder="Nama Pembeli" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500" required>
+                <input type="number" step="any" inputmode="decimal" id="tonase_penj" placeholder="Tonase (Kg) - Contoh: 15.5" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500" required>
+                <!-- Menggunakan type text untuk sistem Rupiah otomatis -->
+                <input type="text" inputmode="numeric" id="nom_penj" placeholder="Total Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 rupiah-mask" required>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm uppercase tracking-widest text-xs">Simpan Penjualan</button>
             </form>
         </div>
 
         <!-- Area Form Operasional -->
-        <div id="area-operasional" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden transition-colors">
+        <div id="area-operasional" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden">
             <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white">Catat Modal & Pengeluaran</h2>
             <form id="form-operasional" class="space-y-4">
                 <select id="kategori_opr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-center uppercase text-xs">
-                    <option value="modal">🟢 Tambah Modal Kas (Dana PUAP, Panen Musim Sebelumnya)</option>
-                    <option value="peng_tanam">🌱 Biaya Tanam (Bibit, Pupuk, Pestisida)(</option>
-                    <option value="peng_op">⚡ Biaya Operasional (Tenaga Kerja, Listrik, Kuota)</option>
-                    <option value="peng_aset">📦 Aset/Inventaris (Pompa, Plastik UV, Paralon)</option>
+                    <option value="modal">🟢 Tambah Modal Kas</option>
+                    <option value="peng_tanam">🌱 Biaya Tanam</option>
+                    <option value="peng_op">⚡ Biaya Operasional</option>
+                    <option value="peng_aset">📦 Aset/Inventaris</option>
                 </select>
-                <input type="text" id="ket_opr" placeholder="Keterangan Barang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
-                <input type="number" id="nom_opr" placeholder="Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
+                <input type="text" id="ket_opr" placeholder="Keterangan Barang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500" required>
+                <input type="text" inputmode="numeric" id="nom_opr" placeholder="Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 rupiah-mask" required>
                 <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg shadow-sm uppercase tracking-widest text-xs">Simpan Transaksi Kas</button>
             </form>
         </div>
 
         <!-- Area Form Hutang -->
-        <div id="area-hutang" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden transition-colors">
+        <div id="area-hutang" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden">
             <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white">Catat Utang & Piutang</h2>
             <form id="form-hutang" class="space-y-4">
                 <select id="kategori_hutang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-center uppercase text-xs">
                     <option value="piutang">📈 Piutang (Diberi Pinjam)</option>
                     <option value="hutang">📉 Utang (Meminjam Uang)</option>
                 </select>
-                <input type="text" id="ket_hutang" placeholder="Keterangan / Nama Orang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
-                <input type="number" id="nom_hutang" placeholder="Nominal (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
+                <input type="text" id="ket_hutang" placeholder="Keterangan / Nama Orang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500" required>
+                <input type="text" inputmode="numeric" id="nom_hutang" placeholder="Nominal (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 rupiah-mask" required>
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm uppercase tracking-widest text-xs">Simpan Catatan</button>
             </form>
         </div>
 
-        <!-- Riwayat Transaksi -->
+        <!-- Riwayat -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
             <div class="flex justify-between items-center mb-3 border-b border-gray-200 dark:border-gray-600 pb-2">
                 <h2 class="text-sm font-bold flex items-center text-gray-900 dark:text-white uppercase"><span id="judul-riwayat">Riwayat Penjualan</span></h2>
@@ -126,7 +129,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Modal Edit -->
     <div id="modal-edit" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-black dark:bg-opacity-70 hidden flex justify-center items-center z-50 px-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 w-full max-w-md shadow-2xl transition-colors text-center">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Edit Transaksi</h3>
@@ -134,9 +137,9 @@
             <div class="space-y-4">
                 <input type="text" id="edit-keterangan" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none" required>
                 <div id="container-edit-tonase">
-                    <input type="number" id="edit-tonase" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none">
+                    <input type="number" step="any" inputmode="decimal" id="edit-tonase" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none">
                 </div>
-                <input type="number" id="edit-nominal" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none" required>
+                <input type="text" inputmode="numeric" id="edit-nominal" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none rupiah-mask" required>
             </div>
             <div class="flex space-x-3 mt-6">
                 <button id="btn-cancel-edit" class="flex-1 py-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold uppercase text-xs">Batal</button>
@@ -148,7 +151,6 @@
     <div id="modal-delete" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-black dark:bg-opacity-70 hidden flex justify-center items-center z-50 px-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 w-full max-w-sm shadow-2xl transition-colors text-center">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase">Hapus Catatan?</h3>
-            <p class="text-xs text-gray-500 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
             <input type="hidden" id="delete-id">
             <div class="flex space-x-3">
                 <button id="btn-cancel-delete" class="flex-1 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold uppercase text-xs">Batal</button>
@@ -158,7 +160,36 @@
     </div>
 
     <script>
-        // Inisialisasi Tema
+        // JS UNTUK FORMAT RUPIAH OTOMATIS
+        const formatRupiahDisplay = (angka) => {
+            let number_string = angka.toString().replace(/[^,\d]/g, ''),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+            return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        };
+
+        // Pasang event listener ke semua input dengan class rupiah-mask
+        document.querySelectorAll('.rupiah-mask').forEach(input => {
+            input.addEventListener('input', function(e) {
+                this.value = formatRupiahDisplay(this.value);
+            });
+        });
+
+        // Bersihkan titik sebelum simpan/hitung[cite: 1]
+        const cleanNominal = (val) => parseInt(val.toString().replace(/\./g, '')) || 0;
+
+        document.addEventListener('wheel', function(event) {
+            if (document.activeElement.type === 'number') document.activeElement.blur();
+        });
+
+        // Logika Tema
         const themeToggleBtn = document.getElementById('theme-toggle');
         const darkIcon = document.getElementById('theme-toggle-dark-icon');
         const lightIcon = document.getElementById('theme-toggle-light-icon');
@@ -191,7 +222,7 @@
             document.getElementById('dash-pemasukan').innerText = formatRupiah(totalPem);
             document.getElementById('dash-pengeluaran').innerText = formatRupiah(state.totalPengeluaran);
             document.getElementById('dash-kas').innerText = formatRupiah(state.kas);
-            document.getElementById('dash-kg-terjual').innerText = `${state.kgTerjual} Kg`;
+            document.getElementById('dash-kg-terjual').innerText = `${state.kgTerjual.toLocaleString('id-ID')} Kg`;
             const k = document.getElementById('dash-kas');
             k.className = state.kas < 0 ? "text-lg font-bold text-red-600 dark:text-red-400" : "text-lg font-bold text-green-600 dark:text-green-400";
         };
@@ -226,7 +257,7 @@
                 if (t.jenis.startsWith('peng_')) { color = "text-red-600 dark:text-red-400"; sign = "-"; }
                 if (t.jenis === 'hutang') { color = "text-purple-600"; sign = "(U)"; }
                 if (t.jenis === 'piutang') { color = "text-indigo-600"; sign = "(P)"; }
-                li.innerHTML = `<div class="flex-1"><p class="text-sm font-bold dark:text-white">${t.keterangan} ${t.tonase > 0 ? `<small class="bg-gray-200 dark:bg-gray-700 px-1 rounded">(${t.tonase}Kg)</small>` : ''}</p><p class="text-[9px] text-gray-500 uppercase font-bold tracking-tight">${t.waktu}</p></div><div class="text-right"><div class="${color} font-bold text-sm">${sign} ${formatRupiah(t.nominal)}</div><div class="flex justify-end space-x-2 mt-1"><button onclick="openEditModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-bold">Edit</button><button onclick="openDeleteModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-red-600 uppercase font-bold">Hapus</button></div></div>`;
+                li.innerHTML = `<div class="flex-1"><p class="text-sm font-bold dark:text-white">${t.keterangan} ${t.tonase > 0 ? `<small class="bg-gray-200 dark:bg-gray-700 px-1 rounded">(${t.tonase.toLocaleString('id-ID')}Kg)</small>` : ''}</p><p class="text-[9px] text-gray-500 uppercase font-bold tracking-tight">${t.waktu}</p></div><div class="text-right"><div class="${color} font-bold text-sm">${sign} ${formatRupiah(t.nominal)}</div><div class="flex justify-end space-x-2 mt-1"><button onclick="openEditModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-bold">Edit</button><button onclick="openDeleteModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-red-600 uppercase font-bold">Hapus</button></div></div>`;
                 l.appendChild(li);
             });
         };
@@ -243,18 +274,19 @@
         };
 
         const simpanTrx = (j, k, n, t, f) => {
-            const d = new Date(); const waktu = `${d.getDate()} ${["Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][d.getMonth()]} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-            state.riwayat.push({ id: Date.now().toString(), jenis: j, keterangan: k, nominal: n, tonase: t, waktu, saldoKas: 0 });
+            const d = new Date(); const waktu = `${d.getDate()} Mei ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+            state.riwayat.push({ id: Date.now().toString(), jenis: j, keterangan: k, nominal: cleanNominal(n), tonase: parseFloat(t) || 0, waktu, saldoKas: 0 });
             recalculateState(); updateDashboard(); renderRiwayat(); f.reset();
         };
 
-        document.getElementById('form-penjualan').onsubmit = (e) => { e.preventDefault(); simpanTrx('penjualan', document.getElementById('ket_penj').value, parseInt(document.getElementById('nom_penj').value), parseInt(document.getElementById('tonase_penj').value), e.target); };
-        document.getElementById('form-operasional').onsubmit = (e) => { e.preventDefault(); simpanTrx(document.getElementById('kategori_opr').value, document.getElementById('ket_opr').value, parseInt(document.getElementById('nom_opr').value), 0, e.target); };
-        document.getElementById('form-hutang').onsubmit = (e) => { e.preventDefault(); simpanTrx(document.getElementById('kategori_hutang').value, document.getElementById('ket_hutang').value, parseInt(document.getElementById('nom_hutang').value), 0, e.target); };
+        document.getElementById('form-penjualan').onsubmit = (e) => { e.preventDefault(); simpanTrx('penjualan', document.getElementById('ket_penj').value, document.getElementById('nom_penj').value, document.getElementById('tonase_penj').value, e.target); };
+        document.getElementById('form-operasional').onsubmit = (e) => { e.preventDefault(); simpanTrx(document.getElementById('kategori_opr').value, document.getElementById('ket_opr').value, document.getElementById('nom_opr').value, 0, e.target); };
+        document.getElementById('form-hutang').onsubmit = (e) => { e.preventDefault(); simpanTrx(document.getElementById('kategori_hutang').value, document.getElementById('ket_hutang').value, document.getElementById('nom_hutang').value, 0, e.target); };
 
         const openEditModal = (id) => {
             const t = state.riwayat.find(x => x.id === id); if(!t) return;
-            document.getElementById('edit-id').value = t.id; document.getElementById('edit-keterangan').value = t.keterangan; document.getElementById('edit-nominal').value = t.nominal;
+            document.getElementById('edit-id').value = t.id; document.getElementById('edit-keterangan').value = t.keterangan; 
+            document.getElementById('edit-nominal').value = formatRupiahDisplay(t.nominal);
             if(t.jenis === 'penjualan') { document.getElementById('container-edit-tonase').classList.remove('hidden'); document.getElementById('edit-tonase').value = t.tonase; }
             else { document.getElementById('container-edit-tonase').classList.add('hidden'); document.getElementById('edit-tonase').value = 0; }
             document.getElementById('modal-edit').classList.remove('hidden');
@@ -262,7 +294,7 @@
 
         document.getElementById('btn-save-edit').onclick = () => {
             const i = document.getElementById('edit-id').value; const t = state.riwayat.find(x => x.id === i);
-            if(t) { t.keterangan = document.getElementById('edit-keterangan').value; t.nominal = parseInt(document.getElementById('edit-nominal').value) || 0; if(t.jenis === 'penjualan') t.tonase = parseInt(document.getElementById('edit-tonase').value) || 0; recalculateState(); updateDashboard(); renderRiwayat(); document.getElementById('modal-edit').classList.add('hidden'); }
+            if(t) { t.keterangan = document.getElementById('edit-keterangan').value; t.nominal = cleanNominal(document.getElementById('edit-nominal').value); if(t.jenis === 'penjualan') t.tonase = parseFloat(document.getElementById('edit-tonase').value) || 0; recalculateState(); updateDashboard(); renderRiwayat(); document.getElementById('modal-edit').classList.add('hidden'); }
         };
 
         const openDeleteModal = (id) => { document.getElementById('delete-id').value = id; document.getElementById('modal-delete').classList.remove('hidden'); };
@@ -274,7 +306,6 @@
         document.getElementById('btn-cancel-edit').onclick = () => document.getElementById('modal-edit').classList.add('hidden');
         document.getElementById('btn-cancel-delete').onclick = () => document.getElementById('modal-delete').classList.add('hidden');
 
-        // LOGIKA DOWNLOAD PDF SESUAI PERMINTAAN
         document.getElementById('btn-download-pdf').onclick = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -289,7 +320,6 @@
             const tglSaja = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
             const cetakWaktuFull = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}, ${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}.${now.getSeconds().toString().padStart(2, '0')}`;
 
-            // Map Label Filename
             const labelMap = { 'penjualan': 'Penjualan', 'operasional': 'Operasional', 'hutang': 'UtangPiutang' };
             const namaFile = `Laporan_${labelMap[state.activeTab]}_${tglSaja}.pdf`;
 
@@ -298,14 +328,13 @@
                 doc.text("LAPORAN PENJUALAN GREENHOUSE", 14, 25);
                 doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
                 doc.text(`Waktu Cetak: ${cetakWaktuFull}`, 14, 33);
-                
                 doc.setFontSize(14); doc.setTextColor(0); doc.text("Ringkasan Penjualan:", 14, 50);
-                doc.setFontSize(12); doc.text(`- Total Penjualan Melon: ${state.kgTerjual} Kg`, 14, 60);
+                doc.setFontSize(12); doc.text(`- Total Penjualan Melon: ${state.kgTerjual.toLocaleString('id-ID')} Kg`, 14, 60);
                 doc.text(`- Total Omset Pemasukan: ${formatRupiah(state.omsetPenjualan)}`, 14, 68);
 
                 doc.autoTable({
                     startY: 80, head: [['Waktu', 'Keterangan', 'Tonase (Kg)', 'Pemasukan (Rp)']],
-                    body: f.map(x => [x.waktu, x.keterangan, `${x.tonase} Kg`, formatRupiah(x.nominal)]),
+                    body: f.map(x => [x.waktu, x.keterangan, `${x.tonase.toLocaleString('id-ID')} Kg`, formatRupiah(x.nominal)]),
                     headStyles: { fillColor: [59, 130, 246], fontSize: 10 }, theme: 'striped', styles: { fontSize: 10 }, columnStyles: { 3: { halign: 'right' } }
                 });
             } else if (state.activeTab === 'operasional') {
@@ -313,7 +342,6 @@
                 doc.text("LAPORAN OPERASIONAL & KAS", 14, 25);
                 doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
                 doc.text(`Waktu Cetak: ${cetakWaktuFull}`, 14, 33);
-
                 doc.setFontSize(14); doc.setTextColor(0); doc.text("Ringkasan Kas Terkini:", 14, 50);
                 doc.setFontSize(12);
                 doc.text(`- Total Pemasukan: ${formatRupiah(state.modal + state.omsetPenjualan)}`, 14, 60);
