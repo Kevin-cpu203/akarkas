@@ -249,7 +249,22 @@
             omsetPenjualan: 0,
             totalPengeluaran: 0,
             riwayat: [],
-            activeTab: 'penjualan' // penjualan, operasional
+            activeTab: 'penjualan'
+        }; // <--- Pastikan ada tutup kurung dan titik koma ini
+
+        // Fungsi Simpan ke Memori HP
+        const saveData = () => {
+            localStorage.setItem('akarkas_data', JSON.stringify(state));
+        };
+
+        // Fungsi Muat dari Memori HP
+        const loadData = () => {
+            const savedData = localStorage.getItem('akarkas_data');
+            if (savedData) {
+                state = JSON.parse(savedData);
+                updateDashboard();
+                renderRiwayat();
+            }
         };
 
         // Formatter Mata Uang Rupiah
@@ -348,6 +363,7 @@
                 // Catat saldo kas pada titik ini untuk laporan PDF
                 trx.saldoKas = state.kas;
             });
+            saveData(); // <--- Tambahkan ini agar setiap ada perubahan langsung tersimpan[cite: 1]
         };
 
         // Fungsi Buka Modal Edit
@@ -719,7 +735,8 @@
                 }
             }
         });
-
+    // Panggil muat data saat aplikasi pertama kali terbuka
+        loadData();
     </script>
 </body>
 </html>
