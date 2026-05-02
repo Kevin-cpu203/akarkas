@@ -2,16 +2,14 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AkarKas - Pencatatan Keuangan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Konfigurasi Tailwind untuk Dark Mode -->
     <script>
         tailwind.config = {
             darkMode: 'class',
         }
-        
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -23,51 +21,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #1f2937; 
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #4b5563; 
-            border-radius: 10px;
-        }
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
         input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white font-sans antialiased pb-10 transition-colors duration-200">
 
     <div class="max-w-md mx-auto pt-6 px-4">
-        
         <!-- Header & Tema Toggle -->
         <div class="mb-6 flex justify-between items-start">
             <div class="flex-1"></div>
             <div class="text-center flex-1">
                 <h1 class="text-3xl font-bold text-green-600 dark:text-green-400">AkarKas</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 whitespace-nowrap">Pencatatan Keuangan</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Pencatatan Keuangan</p>
             </div>
             <div class="flex-1 flex justify-end">
-                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 transition-colors">
-                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm p-2.5 transition-colors">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
                 </button>
             </div>
         </div>
 
-        <!-- Dashboard Rekap Sederhana -->
+        <!-- Dashboard Rekap -->
         <div class="grid grid-cols-2 gap-3 mb-6">
             <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
                 <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Total Pemasukan</p>
@@ -89,82 +69,48 @@
 
         <!-- Tab Navigasi -->
         <div class="flex space-x-1 mb-4 bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
-            <button id="btn-tab-penjualan" class="flex-1 py-2.5 rounded-lg bg-blue-500 text-white font-bold text-[11px] uppercase transition-colors shadow-sm">Penjualan</button>
+            <button id="btn-tab-penjualan" class="flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm">Penjualan</button>
             <button id="btn-tab-operasional" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">Operasional</button>
-            <!-- Tab Baru -->
             <button id="btn-tab-hutang" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">Hutang/Piutang</button>
         </div>
 
         <!-- Area Form Penjualan -->
         <div id="area-penjualan" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 block transition-colors">
-            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">
-                Catat Penjualan Melon
-            </h2>
-            <form id="form-penjualan">
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Keterangan / Nama Pembeli</label>
-                    <input type="text" id="ket_penj" placeholder="Contoh: Pak Budi / Pengepul" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Tonase Keluar (Kg)</label>
-                    <input type="number" id="tonase_penj" placeholder="Contoh: 15" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Total Nominal Uang (Rp)</label>
-                    <input type="number" id="nom_penj" placeholder="0" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                </div>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">Catat Penjualan Melon</h2>
+            <form id="form-penjualan" class="space-y-4">
+                <input type="text" id="ket_penj" placeholder="Keterangan / Nama Pembeli" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
+                <input type="number" id="tonase_penj" placeholder="Tonase Keluar (Kg)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
+                <input type="number" id="nom_penj" placeholder="Total Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-sm">Simpan Penjualan</button>
             </form>
         </div>
 
         <!-- Area Form Operasional -->
         <div id="area-operasional" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden transition-colors">
-            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">
-                Catat Modal & Pengeluaran
-            </h2>
-            <form id="form-operasional">
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Kategori Transaksi</label>
-                    <select id="kategori_opr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 text-center font-medium transition-colors">
-                        <option value="modal">🟢 Tambah Modal Kas</option>
-                        <option value="peng_tanam">🌱 Biaya Tanam</option>
-                        <option value="peng_op">⚡ Biaya Operasional</option>
-                        <option value="peng_aset">📦 Aset/Inventaris</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Keterangan Barang / Sumber Dana</label>
-                    <input type="text" id="ket_opr" placeholder="Contoh: Beli Pupuk AB Mix" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Nominal Uang (Rp)</label>
-                    <input type="number" id="nom_opr" placeholder="0" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
-                </div>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">Catat Modal & Pengeluaran</h2>
+            <form id="form-operasional" class="space-y-4">
+                <select id="kategori_opr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-gray-600 text-center uppercase text-xs">
+                    <option value="modal">🟢 Tambah Modal Kas (Dana PUAP, Dana Hibah)</option>
+                    <option value="peng_tanam">🌱 Biaya Tanam (Bibit, Obat, Pupuk, Polibag)</option>
+                    <option value="peng_op">⚡ Biaya Operasional (Tenaga Kerja, Listrik, Paket Data)</option>
+                    <option value="peng_aset">📦 Aset/Inventaris (Pompa, Paralon, Plastik UV)</option>
+                </select>
+                <input type="text" id="ket_opr" placeholder="Keterangan Barang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
+                <input type="number" id="nom_opr" placeholder="Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
                 <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-200 shadow-sm">Simpan Transaksi Kas</button>
             </form>
         </div>
 
-        <!-- Area Form Hutang (Form Baru) -->
+        <!-- Area Form Hutang -->
         <div id="area-hutang" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden transition-colors">
-            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">
-                Catat Hutang & Piutang
-            </h2>
-            <form id="form-hutang">
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Jenis Catatan</label>
-                    <select id="kategori_hutang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 text-center font-medium transition-colors">
-                        <option value="piutang">📈 Piutang (Orang Hutang ke Kita)</option>
-                        <option value="hutang">📉 Hutang (Kita Hutang ke Orang)</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Keterangan / Nama Orang</label>
-                    <input type="text" id="ket_hutang" placeholder="Contoh: Pinjaman Pupuk Pak Jojo" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Nominal (Rp)</label>
-                    <input type="number" id="nom_hutang" placeholder="0" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
-                </div>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">Catat Hutang & Piutang</h2>
+            <form id="form-hutang" class="space-y-4">
+                <select id="kategori_hutang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-gray-600 text-center uppercase text-xs">
+                    <option value="piutang">📈 Piutang (Orang Hutang ke Kita)</option>
+                    <option value="hutang">📉 Hutang (Kita Hutang ke Orang)</option>
+                </select>
+                <input type="text" id="ket_hutang" placeholder="Keterangan / Nama Orang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
+                <input type="number" id="nom_hutang" placeholder="Nominal (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-sm">Simpan Catatan</button>
             </form>
         </div>
@@ -172,297 +118,231 @@
         <!-- Riwayat Transaksi -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
             <div class="flex justify-between items-center mb-3 border-b border-gray-200 dark:border-gray-600 pb-2">
-                <h2 class="text-sm font-bold flex items-center text-gray-900 dark:text-white uppercase">
-                    <span id="judul-riwayat">Riwayat Penjualan</span>
-                </h2>
+                <h2 class="text-sm font-bold flex items-center text-gray-900 dark:text-white uppercase"><span id="judul-riwayat">Riwayat Penjualan</span></h2>
                 <button id="btn-download-pdf" class="bg-red-500 hover:bg-red-600 text-white text-[10px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm uppercase">Unduh PDF</button>
             </div>
-            
             <div id="empty-state" class="text-center py-6 text-gray-400 dark:text-gray-500 text-sm italic">Belum ada catatan.</div>
             <ul id="history-list" class="space-y-3 max-h-60 overflow-y-auto custom-scroll pr-2 hidden"></ul>
         </div>
-
     </div>
 
-    <!-- Modal Edit Transaksi -->
+    <!-- Modals (Edit & Delete) -->
     <div id="modal-edit" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-black dark:bg-opacity-70 hidden flex justify-center items-center z-50 px-4 transition-opacity">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 w-full max-w-md shadow-2xl transition-colors">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">Edit Transaksi</h3>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 w-full max-w-md shadow-2xl transition-colors text-center">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Edit Transaksi</h3>
             <input type="hidden" id="edit-id">
-            <div class="mb-4">
-                <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Keterangan / Nama</label>
-                <input type="text" id="edit-keterangan" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none transition-colors" required>
-            </div>
-            <div class="mb-4" id="container-edit-tonase">
-                <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Tonase Keluar (Kg)</label>
-                <input type="number" id="edit-tonase" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none">
-            </div>
-            <div class="mb-6">
-                <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Nominal (Rp)</label>
+            <div class="space-y-4">
+                <input type="text" id="edit-keterangan" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none" required>
+                <div id="container-edit-tonase">
+                    <input type="number" id="edit-tonase" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none">
+                </div>
                 <input type="number" id="edit-nominal" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none" required>
             </div>
-            <div class="flex space-x-3">
-                <button id="btn-cancel-edit" class="flex-1 py-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold hover:bg-gray-300 transition duration-200 uppercase text-xs">Batal</button>
-                <button id="btn-save-edit" class="flex-1 py-3 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition duration-200 shadow-sm uppercase text-xs">Simpan</button>
+            <div class="flex space-x-3 mt-6">
+                <button id="btn-cancel-edit" class="flex-1 py-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold uppercase text-xs">Batal</button>
+                <button id="btn-save-edit" class="flex-1 py-3 rounded-lg bg-blue-600 text-white font-bold uppercase text-xs">Simpan</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Hapus -->
     <div id="modal-delete" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-black dark:bg-opacity-70 hidden flex justify-center items-center z-50 px-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 w-full max-w-sm shadow-2xl transition-colors text-center">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase">Hapus Catatan?</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Tindakan ini permanen.</p>
+            <p class="text-xs text-gray-500 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
             <input type="hidden" id="delete-id">
             <div class="flex space-x-3">
                 <button id="btn-cancel-delete" class="flex-1 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold uppercase text-xs">Batal</button>
-                <button id="btn-confirm-delete" class="flex-1 py-2.5 rounded-lg bg-red-600 text-white font-bold shadow-sm uppercase text-xs">Ya, Hapus</button>
+                <button id="btn-confirm-delete" class="flex-1 py-2.5 rounded-lg bg-red-600 text-white font-bold uppercase text-xs">Hapus</button>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('wheel', function(event) {
-            if (document.activeElement.type === 'number') document.activeElement.blur();
+        // Logika Dark/Light Mode
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (document.documentElement.classList.contains('dark')) lightIcon.classList.remove('hidden');
+        else darkIcon.classList.remove('hidden');
+
+        themeToggleBtn.addEventListener('click', function() {
+            darkIcon.classList.toggle('hidden');
+            lightIcon.classList.toggle('hidden');
+            if (localStorage.getItem('color-theme') === 'light') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            }
         });
 
+        // State Aplikasi
         let state = {
-            modal: 0,
-            kas: 0,
-            kgTerjual: 0,
-            omsetPenjualan: 0,
-            totalPengeluaran: 0,
-            riwayat: [],
-            activeTab: 'penjualan'
+            modal: 0, kas: 0, kgTerjual: 0, omsetPenjualan: 0, totalPengeluaran: 0,
+            riwayat: [], activeTab: 'penjualan'
         };
 
         const saveData = () => localStorage.setItem('akarkas_data', JSON.stringify(state));
-
-        const loadData = () => {
-            const savedData = localStorage.getItem('akarkas_data');
-            if (savedData) {
-                state = JSON.parse(savedData);
-                updateDashboard();
-                renderRiwayat();
-            }
-        };
-
-        const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-
-        const btnTabPenj = document.getElementById('btn-tab-penjualan');
-        const btnTabOpr = document.getElementById('btn-tab-operasional');
-        const btnTabHut = document.getElementById('btn-tab-hutang'); // Elemen Baru
-        
-        const areaPenj = document.getElementById('area-penjualan');
-        const areaOpr = document.getElementById('area-operasional');
-        const areaHut = document.getElementById('area-hutang'); // Elemen Baru
-
-        const judulRiwayat = document.getElementById('judul-riwayat');
-
-        const switchTab = (tabName) => {
-            state.activeTab = tabName;
-
-            [btnTabPenj, btnTabOpr, btnTabHut].forEach(btn => {
-                btn.className = "flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors shadow-sm";
-            });
-
-            [areaPenj, areaOpr, areaHut].forEach(area => area.classList.replace('block', 'hidden'));
-
-            if (tabName === 'penjualan') {
-                btnTabPenj.className = "flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm";
-                areaPenj.classList.replace('hidden', 'block');
-                judulRiwayat.innerText = "Riwayat Penjualan";
-            } else if (tabName === 'operasional') {
-                btnTabOpr.className = "flex-1 py-2.5 rounded-lg bg-yellow-500 text-gray-900 font-bold text-[11px] uppercase transition-colors shadow-sm";
-                areaOpr.classList.replace('hidden', 'block');
-                judulRiwayat.innerText = "Riwayat Operasional";
-            } else if (tabName === 'hutang') {
-                btnTabHut.className = "flex-1 py-2.5 rounded-lg bg-purple-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm";
-                areaHut.classList.replace('hidden', 'block');
-                judulRiwayat.innerText = "Riwayat Hutang & Piutang";
-            }
-            renderRiwayat();
-        };
-
-        btnTabPenj.addEventListener('click', () => switchTab('penjualan'));
-        btnTabOpr.addEventListener('click', () => switchTab('operasional'));
-        btnTabHut.addEventListener('click', () => switchTab('hutang')); // Event Baru
+        const formatRupiah = (a) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(a);
 
         const updateDashboard = () => {
-            const totalPemasukan = state.modal + state.omsetPenjualan;
-            document.getElementById('dash-pemasukan').innerText = formatRupiah(totalPemasukan);
+            const totalPem = state.modal + state.omsetPenjualan;
+            document.getElementById('dash-pemasukan').innerText = formatRupiah(totalPem);
             document.getElementById('dash-pengeluaran').innerText = formatRupiah(state.totalPengeluaran);
             document.getElementById('dash-kas').innerText = formatRupiah(state.kas);
             document.getElementById('dash-kg-terjual').innerText = `${state.kgTerjual} Kg`;
+            const k = document.getElementById('dash-kas');
+            k.className = state.kas < 0 ? "text-lg font-bold text-red-600 dark:text-red-400" : "text-lg font-bold text-green-600 dark:text-green-400";
         };
 
         const recalculateState = () => {
             state.modal = 0; state.kas = 0; state.kgTerjual = 0; state.omsetPenjualan = 0; state.totalPengeluaran = 0;
-            state.riwayat.forEach(trx => {
-                if (trx.jenis === 'modal') { state.modal += trx.nominal; state.kas += trx.nominal; }
-                else if (trx.jenis.startsWith('peng_')) { state.kas -= trx.nominal; state.totalPengeluaran += trx.nominal; }
-                else if (trx.jenis === 'penjualan') { state.kas += trx.nominal; state.kgTerjual += trx.tonase; state.omsetPenjualan += trx.nominal; }
-                trx.saldoKas = state.kas;
+            state.riwayat.forEach(t => {
+                if (t.jenis === 'modal') { state.modal += t.nominal; state.kas += t.nominal; }
+                else if (t.jenis.startsWith('peng_')) { state.kas -= t.nominal; state.totalPengeluaran += t.nominal; }
+                else if (t.jenis === 'penjualan') { state.kas += t.nominal; state.kgTerjual += t.tonase; state.omsetPenjualan += t.nominal; }
+                t.saldoKas = state.kas;
             });
             saveData();
         };
 
+        const renderRiwayat = () => {
+            const l = document.getElementById('history-list');
+            const e = document.getElementById('empty-state');
+            l.innerHTML = '';
+            const f = state.riwayat.filter(t => {
+                if (state.activeTab === 'penjualan') return t.jenis === 'penjualan';
+                if (state.activeTab === 'operasional') return t.jenis.startsWith('peng_') || t.jenis === 'modal';
+                if (state.activeTab === 'hutang') return t.jenis === 'hutang' || t.jenis === 'piutang';
+            });
+            if (f.length === 0) { l.classList.add('hidden'); e.classList.remove('hidden'); return; }
+            l.classList.remove('hidden'); e.classList.add('hidden');
+            [...f].reverse().forEach(t => {
+                const li = document.createElement('li');
+                li.className = "bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex justify-between items-center shadow-sm";
+                let color = "text-gray-600", sign = "";
+                if (t.jenis === 'penjualan' || t.jenis === 'modal') { color = "text-blue-600 dark:text-blue-400"; sign = "+"; }
+                if (t.jenis.startsWith('peng_')) { color = "text-red-600 dark:text-red-400"; sign = "-"; }
+                if (t.jenis === 'hutang') { color = "text-purple-600"; sign = "(H)"; }
+                if (t.jenis === 'piutang') { color = "text-indigo-600"; sign = "(P)"; }
+                li.innerHTML = `<div class="flex-1"><p class="text-sm font-medium dark:text-white">${t.keterangan} ${t.tonase > 0 ? `<small>(${t.tonase}Kg)</small>` : ''}</p><p class="text-[9px] text-gray-500 uppercase font-bold">${t.waktu}</p></div><div class="text-right"><div class="${color} font-bold text-sm">${sign} ${formatRupiah(t.nominal)}</div><div class="flex justify-end space-x-2 mt-1"><button onclick="openEditModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-bold">Edit</button><button onclick="openDeleteModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-red-600 uppercase font-bold">Hapus</button></div></div>`;
+                l.appendChild(li);
+            });
+        };
+
+        const switchTab = (n) => {
+            state.activeTab = n;
+            const btnPenj = document.getElementById('btn-tab-penjualan'), btnOpr = document.getElementById('btn-tab-operasional'), btnHut = document.getElementById('btn-tab-hutang');
+            [btnPenj, btnOpr, btnHut].forEach(b => b.className = "flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors");
+            document.getElementById('area-penjualan').classList.add('hidden'); document.getElementById('area-operasional').classList.add('hidden'); document.getElementById('area-hutang').classList.add('hidden');
+            if (n === 'penjualan') { btnPenj.className = "flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors"; document.getElementById('area-penjualan').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Penjualan"; }
+            else if (n === 'operasional') { btnOpr.className = "flex-1 py-2.5 rounded-lg bg-yellow-500 text-gray-900 font-bold text-[11px] uppercase transition-colors"; document.getElementById('area-operasional').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Operasional"; }
+            else { btnHut.className = "flex-1 py-2.5 rounded-lg bg-purple-600 text-white font-bold text-[11px] uppercase transition-colors"; document.getElementById('area-hutang').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Hutang/Piutang"; }
+            renderRiwayat();
+        };
+
+        const simpanTrx = (j, k, n, t, f) => {
+            const d = new Date(); const waktu = `${d.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][d.getMonth()]} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+            state.riwayat.push({ id: Date.now().toString(), jenis: j, keterangan: k, nominal: n, tonase: t, waktu, saldoKas: 0 });
+            recalculateState(); updateDashboard(); renderRiwayat(); f.reset();
+        };
+
+        document.getElementById('form-penjualan').onsubmit = (e) => { e.preventDefault(); simpanTrx('penjualan', document.getElementById('ket_penj').value, parseInt(document.getElementById('nom_penj').value), parseInt(document.getElementById('tonase_penj').value), e.target); };
+        document.getElementById('form-operasional').onsubmit = (e) => { e.preventDefault(); simpanTrx(document.getElementById('kategori_opr').value, document.getElementById('ket_opr').value, parseInt(document.getElementById('nom_opr').value), 0, e.target); };
+        document.getElementById('form-hutang').onsubmit = (e) => { e.preventDefault(); simpanTrx(document.getElementById('kategori_hutang').value, document.getElementById('ket_hutang').value, parseInt(document.getElementById('nom_hutang').value), 0, e.target); };
+
         const openEditModal = (id) => {
-            const trx = state.riwayat.find(t => t.id === id);
-            if(!trx) return;
-            document.getElementById('edit-id').value = trx.id;
-            document.getElementById('edit-keterangan').value = trx.keterangan;
-            document.getElementById('edit-nominal').value = trx.nominal;
-            if(trx.jenis === 'penjualan') {
-                document.getElementById('container-edit-tonase').classList.remove('hidden');
-                document.getElementById('edit-tonase').value = trx.tonase;
-            } else {
-                document.getElementById('container-edit-tonase').classList.add('hidden');
-                document.getElementById('edit-tonase').value = 0;
-            }
+            const t = state.riwayat.find(x => x.id === id); if(!t) return;
+            document.getElementById('edit-id').value = t.id; document.getElementById('edit-keterangan').value = t.keterangan; document.getElementById('edit-nominal').value = t.nominal;
+            if(t.jenis === 'penjualan') { document.getElementById('container-edit-tonase').classList.remove('hidden'); document.getElementById('edit-tonase').value = t.tonase; }
+            else { document.getElementById('container-edit-tonase').classList.add('hidden'); document.getElementById('edit-tonase').value = 0; }
             document.getElementById('modal-edit').classList.remove('hidden');
         };
 
-        document.getElementById('btn-cancel-edit').addEventListener('click', () => document.getElementById('modal-edit').classList.add('hidden'));
-
-        document.getElementById('btn-save-edit').addEventListener('click', () => {
-            const id = document.getElementById('edit-id').value;
-            const trx = state.riwayat.find(t => t.id === id);
-            if(trx) {
-                trx.keterangan = document.getElementById('edit-keterangan').value;
-                trx.nominal = parseInt(document.getElementById('edit-nominal').value) || 0;
-                if(trx.jenis === 'penjualan') trx.tonase = parseInt(document.getElementById('edit-tonase').value) || 0;
-                recalculateState(); updateDashboard(); renderRiwayat();
-                document.getElementById('modal-edit').classList.add('hidden');
-            }
-        });
-
-        const openDeleteModal = (id) => {
-            document.getElementById('delete-id').value = id;
-            document.getElementById('modal-delete').classList.remove('hidden');
+        document.getElementById('btn-save-edit').onclick = () => {
+            const i = document.getElementById('edit-id').value; const t = state.riwayat.find(x => x.id === i);
+            if(t) { t.keterangan = document.getElementById('edit-keterangan').value; t.nominal = parseInt(document.getElementById('edit-nominal').value) || 0; if(t.jenis === 'penjualan') t.tonase = parseInt(document.getElementById('edit-tonase').value) || 0; recalculateState(); updateDashboard(); renderRiwayat(); document.getElementById('modal-edit').classList.add('hidden'); }
         };
 
-        document.getElementById('btn-cancel-delete').addEventListener('click', () => document.getElementById('modal-delete').classList.add('hidden'));
+        const openDeleteModal = (id) => { document.getElementById('delete-id').value = id; document.getElementById('modal-delete').classList.remove('hidden'); };
+        document.getElementById('btn-confirm-delete').onclick = () => { const i = document.getElementById('delete-id').value; state.riwayat = state.riwayat.filter(x => x.id !== i); recalculateState(); updateDashboard(); renderRiwayat(); document.getElementById('modal-delete').classList.add('hidden'); };
 
-        document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-            const id = document.getElementById('delete-id').value;
-            state.riwayat = state.riwayat.filter(trx => trx.id !== id);
-            recalculateState(); updateDashboard(); renderRiwayat();
-            document.getElementById('modal-delete').classList.add('hidden');
-        });
+        document.getElementById('btn-tab-penjualan').onclick = () => switchTab('penjualan');
+        document.getElementById('btn-tab-operasional').onclick = () => switchTab('operasional');
+        document.getElementById('btn-tab-hutang').onclick = () => switchTab('hutang');
+        document.getElementById('btn-cancel-edit').onclick = () => document.getElementById('modal-edit').classList.add('hidden');
+        document.getElementById('btn-cancel-delete').onclick = () => document.getElementById('modal-delete').classList.add('hidden');
 
-        const renderRiwayat = () => {
-            const listEl = document.getElementById('history-list');
-            const emptyState = document.getElementById('empty-state');
-            listEl.innerHTML = '';
-
-            const filteredRiwayat = state.riwayat.filter(trx => {
-                if (state.activeTab === 'penjualan') return trx.jenis === 'penjualan';
-                if (state.activeTab === 'operasional') return trx.jenis.startsWith('peng_') || trx.jenis === 'modal';
-                if (state.activeTab === 'hutang') return trx.jenis === 'hutang' || trx.jenis === 'piutang';
-            });
-
-            if (filteredRiwayat.length === 0) {
-                listEl.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            listEl.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-
-            [...filteredRiwayat].reverse().forEach(trx => {
-                const li = document.createElement('li');
-                li.className = "bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex justify-between items-center transition-colors shadow-sm";
-                
-                let icon = '🛒', warnaNominal = 'text-gray-600', tanda = '';
-                if (trx.jenis === 'modal') { icon = '🟢'; warnaNominal = 'text-green-600'; tanda = '+'; }
-                else if (trx.jenis === 'penjualan') { icon = '🍉'; warnaNominal = 'text-blue-600'; tanda = '+'; }
-                else if (trx.jenis.startsWith('peng_')) { icon = '💸'; warnaNominal = 'text-red-600'; tanda = '-'; }
-                else if (trx.jenis === 'hutang') { icon = '📉'; warnaNominal = 'text-purple-600'; tanda = '(Hutang)'; }
-                else if (trx.jenis === 'piutang') { icon = '📈'; warnaNominal = 'text-indigo-600'; tanda = '(Piutang)'; }
-
-                const tonaseText = trx.tonase > 0 ? `<span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded ml-2">${trx.tonase} Kg</span>` : '';
-
-                li.innerHTML = `
-                    <div class="flex items-center w-full">
-                        <div class="text-xl mr-3">${icon}</div>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white">${trx.keterangan} ${tonaseText}</p>
-                            <p class="text-[9px] text-gray-500 uppercase font-bold">${trx.waktu}</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="${warnaNominal} font-bold text-sm"> ${tanda} ${formatRupiah(trx.nominal)} </div>
-                            <div class="flex justify-end space-x-3 mt-1.5">
-                                <button onclick="openEditModal('${trx.id}')" class="text-[10px] text-gray-400 hover:text-blue-600 uppercase font-bold">Edit</button>
-                                <button onclick="openDeleteModal('${trx.id}')" class="text-[10px] text-gray-400 hover:text-red-600 uppercase font-bold">Hapus</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                listEl.appendChild(li);
-            });
-        };
-
-        const simpanTransaksi = (jenis, keterangan, nominal, tonase, formElement) => {
-            const now = new Date();
-            const waktu = `${now.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][now.getMonth()]} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            state.riwayat.push({ id: Date.now().toString(), jenis, keterangan, nominal, tonase, waktu, saldoKas: 0 });
-            recalculateState(); updateDashboard(); renderRiwayat();
-            formElement.reset();
-        };
-
-        document.getElementById('form-penjualan').addEventListener('submit', (e) => {
-            e.preventDefault();
-            simpanTransaksi('penjualan', document.getElementById('ket_penj').value, parseInt(document.getElementById('nom_penj').value), parseInt(document.getElementById('tonase_penj').value), e.target);
-        });
-
-        document.getElementById('form-operasional').addEventListener('submit', (e) => {
-            e.preventDefault();
-            simpanTransaksi(document.getElementById('kategori_opr').value, document.getElementById('ket_opr').value, parseInt(document.getElementById('nom_opr').value), 0, e.target);
-        });
-
-        // Handler Baru untuk Hutang
-        document.getElementById('form-hutang').addEventListener('submit', (e) => {
-            e.preventDefault();
-            simpanTransaksi(document.getElementById('kategori_hutang').value, document.getElementById('ket_hutang').value, parseInt(document.getElementById('nom_hutang').value), 0, e.target);
-        });
-
-        document.getElementById('btn-download-pdf').addEventListener('click', () => {
-            const filteredRiwayat = state.riwayat.filter(trx => {
-                if (state.activeTab === 'penjualan') return trx.jenis === 'penjualan';
-                if (state.activeTab === 'operasional') return trx.jenis.startsWith('peng_') || trx.jenis === 'modal';
-                if (state.activeTab === 'hutang') return trx.jenis === 'hutang' || trx.jenis === 'piutang';
-            });
-
-            if (filteredRiwayat.length === 0) return;
-
+        // LOGIKA DOWNLOAD PDF SESUAI GAMBAR[cite: 1]
+        document.getElementById('btn-download-pdf').onclick = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const warnaHeader = state.activeTab === 'penjualan' ? [59, 130, 246] : (state.activeTab === 'operasional' ? [234, 179, 8] : [147, 51, 234]);
-            
-            doc.setFontSize(16); doc.setTextColor(warnaHeader[0], warnaHeader[1], warnaHeader[2]);
-            doc.text(`LAPORAN ${state.activeTab.toUpperCase()} AKARKAS`, 14, 20);
-            
-            const tableRows = filteredRiwayat.map(trx => [trx.waktu, trx.jenis.toUpperCase(), trx.keterangan, formatRupiah(trx.nominal)]);
-            doc.autoTable({
-                startY: 30,
-                head: [['Waktu', 'Jenis', 'Keterangan', 'Nominal']],
-                body: tableRows,
-                headStyles: { fillColor: warnaHeader }
+            const f = state.riwayat.filter(t => {
+                if (state.activeTab === 'penjualan') return t.jenis === 'penjualan';
+                if (state.activeTab === 'operasional') return t.jenis.startsWith('peng_') || t.jenis === 'modal';
+                if (state.activeTab === 'hutang') return t.jenis === 'hutang' || t.jenis === 'piutang';
             });
-            doc.save(`Laporan_${state.activeTab}.pdf`);
-        });
+            if(f.length === 0) return;
 
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        themeToggleBtn.addEventListener('click', function() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            document.getElementById('theme-toggle-dark-icon').classList.toggle('hidden');
-            document.getElementById('theme-toggle-light-icon').classList.toggle('hidden');
-        });
+            const now = new Date();
+            const cetakWaktu = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}, ${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}.${now.getSeconds().toString().padStart(2, '0')}`;
 
-        loadData();
+            if (state.activeTab === 'penjualan') {
+                doc.setFontSize(22); doc.setTextColor(59, 130, 246); doc.setFont("helvetica", "bold");
+                doc.text("LAPORAN PENJUALAN GREENHOUSE", 14, 25);
+                doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
+                doc.text(`Waktu Cetak: ${cetakWaktu}`, 14, 33);
+                
+                doc.setFontSize(14); doc.setTextColor(0); doc.text("Ringkasan Penjualan:", 14, 50);
+                doc.setFontSize(12); doc.text(`- Total Penjualan Melon: ${state.kgTerjual} Kg`, 14, 60);
+                doc.text(`- Total Omset Pemasukan: ${formatRupiah(state.omsetPenjualan)}`, 14, 68);
+
+                doc.autoTable({
+                    startY: 80, head: [['Waktu', 'Keterangan', 'Tonase (Kg)', 'Pemasukan (Rp)']],
+                    body: f.map(x => [x.waktu, x.keterangan, `${x.tonase} Kg`, formatRupiah(x.nominal)]),
+                    headStyles: { fillColor: [59, 130, 246] }, theme: 'striped', columnStyles: { 3: { halign: 'right' } }
+                });
+            } else if (state.activeTab === 'operasional') {
+                doc.setFontSize(22); doc.setTextColor(234, 179, 8); doc.setFont("helvetica", "bold");
+                doc.text("LAPORAN OPERASIONAL & KAS", 14, 25);
+                doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
+                doc.text(`Waktu Cetak: ${cetakWaktu}`, 14, 33);
+
+                doc.setFontSize(14); doc.setTextColor(0); doc.text("Ringkasan Kas Terkini:", 14, 50);
+                doc.setFontSize(12);
+                doc.text(`- Total Pemasukan: ${formatRupiah(state.modal + state.omsetPenjualan)}`, 14, 60);
+                doc.text(`- Total Pengeluaran: ${formatRupiah(state.totalPengeluaran)}`, 14, 68);
+                doc.text(`- Sisa Kas Tersedia: ${formatRupiah(state.kas)}`, 110, 60);
+
+                doc.autoTable({
+                    startY: 80,
+                    head: [
+                        [{ content: 'Tanggal', rowSpan: 2 }, { content: 'Keterangan Barang', rowSpan: 2 }, { content: 'Pemasukan', rowSpan: 2 }, { content: 'Pengeluaran', colSpan: 3, styles: { halign: 'center' } }, { content: 'Sisa Kas', rowSpan: 2 }],
+                        ['Biaya Tanam', 'Biaya Operasional', 'Inventarisasi']
+                    ],
+                    body: f.map(x => [
+                        x.waktu, x.keterangan, x.jenis === 'modal' ? formatRupiah(x.nominal) : '-',
+                        x.jenis === 'peng_tanam' ? formatRupiah(x.nominal) : '-', x.jenis === 'peng_op' ? formatRupiah(x.nominal) : '-',
+                        x.jenis === 'peng_aset' ? formatRupiah(x.nominal) : '-', formatRupiah(x.saldoKas)
+                    ]),
+                    headStyles: { fillColor: [234, 179, 8], lineColor: [255, 255, 255], lineWidth: 0.1 },
+                    theme: 'striped', styles: { fontSize: 8 }, columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right', fontStyle: 'bold' } }
+                });
+            } else {
+                doc.setFontSize(22); doc.setTextColor(147, 51, 234); doc.text("LAPORAN HUTANG & PIUTANG", 14, 25);
+                doc.autoTable({
+                    startY: 40, head: [['Waktu', 'Jenis', 'Keterangan', 'Nominal']],
+                    body: f.map(x => [x.waktu, x.jenis.toUpperCase(), x.keterangan, formatRupiah(x.nominal)]),
+                    headStyles: { fillColor: [147, 51, 234] }
+                });
+            }
+            doc.save(`Laporan_${state.activeTab}_${now.getTime()}.pdf`);
+        };
+
+        const loadDataInit = () => { const s = localStorage.getItem('akarkas_data'); if (s) { state = JSON.parse(s); updateDashboard(); renderRiwayat(); } };
+        loadDataInit();
     </script>
 </body>
 </html>
