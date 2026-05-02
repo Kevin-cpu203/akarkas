@@ -32,12 +32,12 @@
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white font-sans antialiased pb-10 transition-colors duration-200">
 
     <div class="max-w-md mx-auto pt-6 px-4">
-        <!-- Header & Tema Toggle -->
+        <!-- Header -->
         <div class="mb-6 flex justify-between items-start">
             <div class="flex-1"></div>
             <div class="text-center flex-1">
                 <h1 class="text-3xl font-bold text-green-600 dark:text-green-400">AkarKas</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Pencatatan Keuangan</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-tighter font-bold">Smart Greenhouse Finance</p>
             </div>
             <div class="flex-1 flex justify-end">
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm p-2.5 transition-colors">
@@ -50,19 +50,19 @@
         <!-- Dashboard Rekap -->
         <div class="grid grid-cols-2 gap-3 mb-6">
             <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
-                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Total Pemasukan</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Pemasukan</p>
                 <p class="text-lg font-bold text-blue-600 dark:text-blue-400" id="dash-pemasukan">Rp 0</p>
             </div>
             <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
-                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Total Pengeluaran</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Pengeluaran</p>
                 <p class="text-lg font-bold text-red-600 dark:text-red-400" id="dash-pengeluaran">Rp 0</p>
             </div>
             <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
-                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Sisa Kas Tersedia</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Kas Tersedia</p>
                 <p class="text-lg font-bold text-green-600 dark:text-green-400" id="dash-kas">Rp 0</p>
             </div>
             <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
-                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Total Penjualan</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Total Panen</p>
                 <p class="text-lg font-bold text-gray-900 dark:text-white" id="dash-kg-terjual">0 Kg</p>
             </div>
         </div>
@@ -70,48 +70,48 @@
         <!-- Tab Navigasi -->
         <div class="flex space-x-1 mb-4 bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
             <button id="btn-tab-penjualan" class="flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm">Penjualan</button>
-            <button id="btn-tab-operasional" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">Operasional</button>
-            <button id="btn-tab-hutang" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">Hutang/Piutang</button>
+            <button id="btn-tab-operasional" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors shadow-sm">Operasional</button>
+            <button id="btn-tab-hutang" class="flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors shadow-sm">Utang/Piutang</button>
         </div>
 
         <!-- Area Form Penjualan -->
         <div id="area-penjualan" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 block transition-colors">
-            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">Catat Penjualan Melon</h2>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white">Catat Penjualan Melon</h2>
             <form id="form-penjualan" class="space-y-4">
                 <input type="text" id="ket_penj" placeholder="Keterangan / Nama Pembeli" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
                 <input type="number" id="tonase_penj" placeholder="Tonase Keluar (Kg)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                <input type="number" id="nom_penj" placeholder="Total Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-sm">Simpan Penjualan</button>
+                <input type="number" id="nom_penj" placeholder="Total Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" required>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm uppercase tracking-widest text-xs">Simpan Penjualan</button>
             </form>
         </div>
 
         <!-- Area Form Operasional -->
         <div id="area-operasional" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden transition-colors">
-            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">Catat Modal & Pengeluaran</h2>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white">Catat Modal & Pengeluaran</h2>
             <form id="form-operasional" class="space-y-4">
-                <select id="kategori_opr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-gray-600 text-center uppercase text-xs">
-                    <option value="modal">🟢 Tambah Modal Kas (Dana PUAP, Dana Hibah)</option>
-                    <option value="peng_tanam">🌱 Biaya Tanam (Bibit, Obat, Pupuk, Polibag)</option>
-                    <option value="peng_op">⚡ Biaya Operasional (Tenaga Kerja, Listrik, Paket Data)</option>
-                    <option value="peng_aset">📦 Aset/Inventaris (Pompa, Paralon, Plastik UV)</option>
+                <select id="kategori_opr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-center uppercase text-xs">
+                    <option value="modal">🟢 Tambah Modal Kas (Dana PUAP, Panen Musim Sebelumnya)</option>
+                    <option value="peng_tanam">🌱 Biaya Tanam (Bibit, Pupuk, Pestisida)(</option>
+                    <option value="peng_op">⚡ Biaya Operasional (Tenaga Kerja, Listrik, Kuota)</option>
+                    <option value="peng_aset">📦 Aset/Inventaris (Pompa, Plastik UV, Paralon)</option>
                 </select>
                 <input type="text" id="ket_opr" placeholder="Keterangan Barang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
                 <input type="number" id="nom_opr" placeholder="Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors" required>
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-200 shadow-sm">Simpan Transaksi Kas</button>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg shadow-sm uppercase tracking-widest text-xs">Simpan Transaksi Kas</button>
             </form>
         </div>
 
         <!-- Area Form Hutang -->
         <div id="area-hutang" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 hidden transition-colors">
-            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center text-gray-900 dark:text-white">Catat Hutang & Piutang</h2>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white">Catat Utang & Piutang</h2>
             <form id="form-hutang" class="space-y-4">
-                <select id="kategori_hutang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-gray-600 text-center uppercase text-xs">
-                    <option value="piutang">📈 Piutang (Orang Hutang ke Kita)</option>
-                    <option value="hutang">📉 Hutang (Kita Hutang ke Orang)</option>
+                <select id="kategori_hutang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-center uppercase text-xs">
+                    <option value="piutang">📈 Piutang (Diberi Pinjam)</option>
+                    <option value="hutang">📉 Utang (Meminjam Uang)</option>
                 </select>
                 <input type="text" id="ket_hutang" placeholder="Keterangan / Nama Orang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
                 <input type="number" id="nom_hutang" placeholder="Nominal (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" required>
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-sm">Simpan Catatan</button>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm uppercase tracking-widest text-xs">Simpan Catatan</button>
             </form>
         </div>
 
@@ -126,7 +126,7 @@
         </div>
     </div>
 
-    <!-- Modals (Edit & Delete) -->
+    <!-- Modals -->
     <div id="modal-edit" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-black dark:bg-opacity-70 hidden flex justify-center items-center z-50 px-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 w-full max-w-md shadow-2xl transition-colors text-center">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Edit Transaksi</h3>
@@ -158,7 +158,7 @@
     </div>
 
     <script>
-        // Logika Dark/Light Mode
+        // Inisialisasi Tema
         const themeToggleBtn = document.getElementById('theme-toggle');
         const darkIcon = document.getElementById('theme-toggle-dark-icon');
         const lightIcon = document.getElementById('theme-toggle-light-icon');
@@ -178,13 +178,12 @@
             }
         });
 
-        // State Aplikasi
+        // State Global
         let state = {
             modal: 0, kas: 0, kgTerjual: 0, omsetPenjualan: 0, totalPengeluaran: 0,
             riwayat: [], activeTab: 'penjualan'
         };
 
-        const saveData = () => localStorage.setItem('akarkas_data', JSON.stringify(state));
         const formatRupiah = (a) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(a);
 
         const updateDashboard = () => {
@@ -205,7 +204,7 @@
                 else if (t.jenis === 'penjualan') { state.kas += t.nominal; state.kgTerjual += t.tonase; state.omsetPenjualan += t.nominal; }
                 t.saldoKas = state.kas;
             });
-            saveData();
+            localStorage.setItem('akarkas_data', JSON.stringify(state));
         };
 
         const renderRiwayat = () => {
@@ -225,9 +224,9 @@
                 let color = "text-gray-600", sign = "";
                 if (t.jenis === 'penjualan' || t.jenis === 'modal') { color = "text-blue-600 dark:text-blue-400"; sign = "+"; }
                 if (t.jenis.startsWith('peng_')) { color = "text-red-600 dark:text-red-400"; sign = "-"; }
-                if (t.jenis === 'hutang') { color = "text-purple-600"; sign = "(H)"; }
+                if (t.jenis === 'hutang') { color = "text-purple-600"; sign = "(U)"; }
                 if (t.jenis === 'piutang') { color = "text-indigo-600"; sign = "(P)"; }
-                li.innerHTML = `<div class="flex-1"><p class="text-sm font-medium dark:text-white">${t.keterangan} ${t.tonase > 0 ? `<small>(${t.tonase}Kg)</small>` : ''}</p><p class="text-[9px] text-gray-500 uppercase font-bold">${t.waktu}</p></div><div class="text-right"><div class="${color} font-bold text-sm">${sign} ${formatRupiah(t.nominal)}</div><div class="flex justify-end space-x-2 mt-1"><button onclick="openEditModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-bold">Edit</button><button onclick="openDeleteModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-red-600 uppercase font-bold">Hapus</button></div></div>`;
+                li.innerHTML = `<div class="flex-1"><p class="text-sm font-bold dark:text-white">${t.keterangan} ${t.tonase > 0 ? `<small class="bg-gray-200 dark:bg-gray-700 px-1 rounded">(${t.tonase}Kg)</small>` : ''}</p><p class="text-[9px] text-gray-500 uppercase font-bold tracking-tight">${t.waktu}</p></div><div class="text-right"><div class="${color} font-bold text-sm">${sign} ${formatRupiah(t.nominal)}</div><div class="flex justify-end space-x-2 mt-1"><button onclick="openEditModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-bold">Edit</button><button onclick="openDeleteModal('${t.id}')" class="text-[9px] text-gray-400 hover:text-red-600 uppercase font-bold">Hapus</button></div></div>`;
                 l.appendChild(li);
             });
         };
@@ -235,16 +234,16 @@
         const switchTab = (n) => {
             state.activeTab = n;
             const btnPenj = document.getElementById('btn-tab-penjualan'), btnOpr = document.getElementById('btn-tab-operasional'), btnHut = document.getElementById('btn-tab-hutang');
-            [btnPenj, btnOpr, btnHut].forEach(b => b.className = "flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors");
+            [btnPenj, btnOpr, btnHut].forEach(b => b.className = "flex-1 py-2.5 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium text-[11px] uppercase border border-gray-300 dark:border-gray-700 transition-colors shadow-sm");
             document.getElementById('area-penjualan').classList.add('hidden'); document.getElementById('area-operasional').classList.add('hidden'); document.getElementById('area-hutang').classList.add('hidden');
-            if (n === 'penjualan') { btnPenj.className = "flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors"; document.getElementById('area-penjualan').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Penjualan"; }
-            else if (n === 'operasional') { btnOpr.className = "flex-1 py-2.5 rounded-lg bg-yellow-500 text-gray-900 font-bold text-[11px] uppercase transition-colors"; document.getElementById('area-operasional').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Operasional"; }
-            else { btnHut.className = "flex-1 py-2.5 rounded-lg bg-purple-600 text-white font-bold text-[11px] uppercase transition-colors"; document.getElementById('area-hutang').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Hutang/Piutang"; }
+            if (n === 'penjualan') { btnPenj.className = "flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm"; document.getElementById('area-penjualan').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Penjualan"; }
+            else if (n === 'operasional') { btnOpr.className = "flex-1 py-2.5 rounded-lg bg-yellow-500 text-gray-900 font-bold text-[11px] uppercase transition-colors shadow-sm"; document.getElementById('area-operasional').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Operasional"; }
+            else { btnHut.className = "flex-1 py-2.5 rounded-lg bg-purple-600 text-white font-bold text-[11px] uppercase transition-colors shadow-sm"; document.getElementById('area-hutang').classList.remove('hidden'); document.getElementById('judul-riwayat').innerText = "Riwayat Utang/Piutang"; }
             renderRiwayat();
         };
 
         const simpanTrx = (j, k, n, t, f) => {
-            const d = new Date(); const waktu = `${d.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][d.getMonth()]} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+            const d = new Date(); const waktu = `${d.getDate()} ${["Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][d.getMonth()]} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
             state.riwayat.push({ id: Date.now().toString(), jenis: j, keterangan: k, nominal: n, tonase: t, waktu, saldoKas: 0 });
             recalculateState(); updateDashboard(); renderRiwayat(); f.reset();
         };
@@ -275,7 +274,7 @@
         document.getElementById('btn-cancel-edit').onclick = () => document.getElementById('modal-edit').classList.add('hidden');
         document.getElementById('btn-cancel-delete').onclick = () => document.getElementById('modal-delete').classList.add('hidden');
 
-        // LOGIKA DOWNLOAD PDF SESUAI GAMBAR[cite: 1]
+        // LOGIKA DOWNLOAD PDF SESUAI PERMINTAAN
         document.getElementById('btn-download-pdf').onclick = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -287,13 +286,18 @@
             if(f.length === 0) return;
 
             const now = new Date();
-            const cetakWaktu = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}, ${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}.${now.getSeconds().toString().padStart(2, '0')}`;
+            const tglSaja = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
+            const cetakWaktuFull = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}, ${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}.${now.getSeconds().toString().padStart(2, '0')}`;
+
+            // Map Label Filename
+            const labelMap = { 'penjualan': 'Penjualan', 'operasional': 'Operasional', 'hutang': 'UtangPiutang' };
+            const namaFile = `Laporan_${labelMap[state.activeTab]}_${tglSaja}.pdf`;
 
             if (state.activeTab === 'penjualan') {
                 doc.setFontSize(22); doc.setTextColor(59, 130, 246); doc.setFont("helvetica", "bold");
                 doc.text("LAPORAN PENJUALAN GREENHOUSE", 14, 25);
                 doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
-                doc.text(`Waktu Cetak: ${cetakWaktu}`, 14, 33);
+                doc.text(`Waktu Cetak: ${cetakWaktuFull}`, 14, 33);
                 
                 doc.setFontSize(14); doc.setTextColor(0); doc.text("Ringkasan Penjualan:", 14, 50);
                 doc.setFontSize(12); doc.text(`- Total Penjualan Melon: ${state.kgTerjual} Kg`, 14, 60);
@@ -302,13 +306,13 @@
                 doc.autoTable({
                     startY: 80, head: [['Waktu', 'Keterangan', 'Tonase (Kg)', 'Pemasukan (Rp)']],
                     body: f.map(x => [x.waktu, x.keterangan, `${x.tonase} Kg`, formatRupiah(x.nominal)]),
-                    headStyles: { fillColor: [59, 130, 246] }, theme: 'striped', columnStyles: { 3: { halign: 'right' } }
+                    headStyles: { fillColor: [59, 130, 246], fontSize: 10 }, theme: 'striped', styles: { fontSize: 10 }, columnStyles: { 3: { halign: 'right' } }
                 });
             } else if (state.activeTab === 'operasional') {
                 doc.setFontSize(22); doc.setTextColor(234, 179, 8); doc.setFont("helvetica", "bold");
                 doc.text("LAPORAN OPERASIONAL & KAS", 14, 25);
                 doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
-                doc.text(`Waktu Cetak: ${cetakWaktu}`, 14, 33);
+                doc.text(`Waktu Cetak: ${cetakWaktuFull}`, 14, 33);
 
                 doc.setFontSize(14); doc.setTextColor(0); doc.text("Ringkasan Kas Terkini:", 14, 50);
                 doc.setFontSize(12);
@@ -327,18 +331,22 @@
                         x.jenis === 'peng_tanam' ? formatRupiah(x.nominal) : '-', x.jenis === 'peng_op' ? formatRupiah(x.nominal) : '-',
                         x.jenis === 'peng_aset' ? formatRupiah(x.nominal) : '-', formatRupiah(x.saldoKas)
                     ]),
-                    headStyles: { fillColor: [234, 179, 8], lineColor: [255, 255, 255], lineWidth: 0.1 },
-                    theme: 'striped', styles: { fontSize: 8 }, columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right', fontStyle: 'bold' } }
+                    headStyles: { fillColor: [234, 179, 8], lineColor: [255, 255, 255], lineWidth: 0.1, fontSize: 9 },
+                    theme: 'striped', styles: { fontSize: 9 }, columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right', fontStyle: 'bold' } }
                 });
             } else {
-                doc.setFontSize(22); doc.setTextColor(147, 51, 234); doc.text("LAPORAN HUTANG & PIUTANG", 14, 25);
+                doc.setFontSize(22); doc.setTextColor(147, 51, 234); doc.setFont("helvetica", "bold");
+                doc.text("LAPORAN UTANG & PIUTANG", 14, 25);
+                doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
+                doc.text(`Waktu Cetak: ${cetakWaktuFull}`, 14, 33);
                 doc.autoTable({
-                    startY: 40, head: [['Waktu', 'Jenis', 'Keterangan', 'Nominal']],
+                    startY: 50, head: [['Waktu', 'Jenis', 'Keterangan', 'Nominal']],
                     body: f.map(x => [x.waktu, x.jenis.toUpperCase(), x.keterangan, formatRupiah(x.nominal)]),
-                    headStyles: { fillColor: [147, 51, 234] }
+                    headStyles: { fillColor: [147, 51, 234], fontSize: 10 },
+                    theme: 'striped', styles: { fontSize: 10 }, columnStyles: { 3: { halign: 'right' } }
                 });
             }
-            doc.save(`Laporan_${state.activeTab}_${now.getTime()}.pdf`);
+            doc.save(namaFile);
         };
 
         const loadDataInit = () => { const s = localStorage.getItem('akarkas_data'); if (s) { state = JSON.parse(s); updateDashboard(); renderRiwayat(); } };
