@@ -94,9 +94,9 @@
             <form id="form-operasional" class="space-y-4">
                 <select id="kategori_opr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg font-bold text-center uppercase text-xs">
                     <option value="modal">🟢 Tambah Modal Kas</option>
-                    <option value="peng_tanam">🌱 Biaya Tanam</option>
-                    <option value="peng_op">⚡ Biaya Operasional</option>
-                    <option value="peng_aset">📦 Aset/Inventaris</option>
+                    <option value="peng_tanam">🌱 Biaya Tanam (Bibit, Pupuk, Pestisida)</option>
+                    <option value="peng_op">⚡ Biaya Operasional (Listrik, tenaga kerja)</option>
+                    <option value="peng_aset">📦 Aset/Inventaris (Pompa, Alat lainnya)</option>
                 </select>
                 <input type="text" id="ket_opr" placeholder="Keterangan Barang" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500" required>
                 <input type="text" inputmode="numeric" id="nom_opr" placeholder="Nominal Uang (Rp)" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-500 rupiah-mask" required>
@@ -374,7 +374,17 @@
                     theme: 'striped', styles: { fontSize: 10 }, columnStyles: { 3: { halign: 'right' } }
                 });
             }
-            doc.save(namaFile);
+            
+            // --- KODE BARU UNTUK BYPASS ERROR BLOB DI ANDROID WEBVIEW ---
+            const pdfDataUri = doc.output('datauristring');
+            const link = document.createElement('a');
+            link.href = pdfDataUri;
+            link.download = namaFile;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // -------------------------------------------------------------
+
         };
 
         const loadDataInit = () => { const s = localStorage.getItem('akarkas_data'); if (s) { state = JSON.parse(s); updateDashboard(); renderRiwayat(); } };
