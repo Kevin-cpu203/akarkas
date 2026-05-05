@@ -122,7 +122,7 @@
         <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
             <div class="flex justify-between items-center mb-3 border-b border-gray-200 dark:border-gray-600 pb-2">
                 <h2 class="text-sm font-bold flex items-center text-gray-900 dark:text-white uppercase"><span id="judul-riwayat">Riwayat Penjualan</span></h2>
-                <button id="btn-download-pdf" class="bg-red-500 hover:bg-red-600 text-white text-[10px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm uppercase">Unduh PDF</button>
+                <button id="btn-download-pdf" class="bg-red-500 hover:bg-red-600 text-white text-[10px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm uppercase">Bagikan PDF</button>
             </div>
             <div id="empty-state" class="text-center py-6 text-gray-400 dark:text-gray-500 text-sm italic">Belum ada catatan.</div>
             <ul id="history-list" class="space-y-3 max-h-60 overflow-y-auto custom-scroll pr-2 hidden"></ul>
@@ -375,14 +375,19 @@
                 });
             }
             
-            // --- KODE BARU UNTUK BYPASS ERROR BLOB DI ANDROID WEBVIEW ---
-            const pdfDataUri = doc.output('datauristring');
-            const link = document.createElement('a');
-            link.href = pdfDataUri;
-            link.download = namaFile;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // --- KODE FITUR BAGIKAN (SHARE) NATIVE ANDROID ---
+            const pdfBlob = doc.output('blob');
+            const file = new File([pdfBlob], namaFile, { type: 'application/pdf' });
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: 'Laporan AkarKas',
+                    text: 'Berikut adalah lampiran laporan keuangan unit usaha.'
+                }).catch((err) => console.log('Batal membagikan:', err));
+            } else {
+                alert('Sistem aplikasi ini membatasi pengunduhan. \n\nSOLUSI: Buka link web AkarKas langsung di aplikasi Google Chrome HP Anda agar bisa mengunduh PDF.');
+            }
             // -------------------------------------------------------------
 
         };
