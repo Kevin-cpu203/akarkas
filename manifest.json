@@ -1,0 +1,16 @@
+{
+  "name": "AkarKas Finance",
+  "short_name": "AkarKas",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1632/1632596.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
