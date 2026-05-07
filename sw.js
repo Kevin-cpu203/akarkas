@@ -1,4 +1,4 @@
-const cacheName = 'akarkas-v1';
+const cacheName = 'akarkas-pro-v1';
 const assets = [
   './',
   './index.html',
@@ -6,23 +6,22 @@ const assets = [
   './assets/tailwindcss.js',
   './assets/jspdf.min.js',
   './assets/jspdf.plugin.autotable.min.js',
-  './assets/icon.png' // <--- Pastikan alamatnya benar (pakai assets/)
+  './assets/icon_perusahaan.png'
 ];
 
-// Tahap Install: Menyimpan file ke memori HP
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
+      console.log('AkarKas: Menabung aset ke memori HP...');
       return cache.addAll(assets);
     })
   );
 });
 
-// Tahap Fetch: Mengambil file dari memori jika offline
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
+    caches.match(e.request).then(res => {
+      return res || fetch(e.request);
     })
   );
 });
