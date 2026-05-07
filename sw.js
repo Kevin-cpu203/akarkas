@@ -6,7 +6,7 @@ const assets = [
   './assets/tailwindcss.js',
   './assets/jspdf.min.js',
   './assets/jspdf.plugin.autotable.min.js',
-  './assets/icon_perusahaan.png' // <--- Pastikan alamatnya benar (pakai assets/)
+  './assets/icon.png' // <--- Pastikan alamatnya benar (pakai assets/)
 ];
 
 // Tahap Install: Menyimpan file ke memori HP
