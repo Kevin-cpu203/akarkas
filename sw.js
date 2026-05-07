@@ -3,10 +3,10 @@ const assets = [
   './',
   './index.html',
   './manifest.json',
-  './icon%20perusahaan.png', // <--- Tambahkan ini agar logo tersimpan di memori HP
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js'
+  './assets/tailwindcss.js',
+  './assets/jspdf.min.js',
+  './assets/jspdf.plugin.autotable.min.js',
+  './assets/icon_perusahaan.png' // <--- Pastikan alamatnya benar (pakai assets/)
 ];
 
 // Tahap Install: Menyimpan file ke memori HP
