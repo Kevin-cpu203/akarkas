@@ -1,4 +1,4 @@
-const cacheName = 'akarkas-pro-v2'; // Naikkan versinya jadi v2
+const cacheName = 'akarkas-v3'; // Naikkan versi ke v3
 const assets = [
   './',
   './index.html',
@@ -9,17 +9,23 @@ const assets = [
   './assets/icon_perusahaan.png'
 ];
 
-// 1. Install: Menabung aset
+// Tahap Install: Menabung file satu per satu
 self.addEventListener('install', e => {
-  self.skipWaiting(); // Paksa SW baru langsung aktif
+  self.skipWaiting();
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      return cache.addAll(assets);
+      console.log('Sedang menabung aset...');
+      // Menggunakan map agar jika satu file error, yang lain tetap masuk cache
+      return Promise.all(
+        assets.map(url => {
+          return cache.add(url).catch(err => console.warn('Gagal menyimpan file:', url));
+        })
+      );
     })
   );
 });
 
-// 2. Activate: Hapus sampah cache lama
+// Tahap Activate: Membersihkan sampah cache lama
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
@@ -28,14 +34,19 @@ self.addEventListener('activate', e => {
       );
     })
   );
-  return self.clients.claim(); // Langsung ambil kendali halaman
+  return self.clients.claim();
 });
 
-// 3. Fetch: Ambil dari tabungan (Offline)
+// Tahap Fetch: Strategi "Ambil dari tabungan dulu, kalau gak ada baru cari internet"
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(res => {
-      return res || fetch(e.request);
+      return res || fetch(e.request).catch(() => {
+        // Jika benar-benar tidak ada internet dan tidak ada di cache
+        if (e.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
 });
