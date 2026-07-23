@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akarkas - Catat</title>
+    <title>Kas Greenhouse - Beranda</title>
     
     <!-- FontAwesome untuk Ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js untuk Grafik Donut -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Palet Warna sesuai Referensi */
+            /* Palet Warna Earth-Tone (Kas Greenhouse Melon) */
             --bg-app: #eef3e6;
             --primary-dark: #385d34;
             --primary-light: #e4f0d9;
@@ -21,7 +23,7 @@
             --white: #ffffff;
             --border-color: #d1d9ce;
             
-            /* Warna Pengeluaran (Merah/Pink) */
+            /* Warna Pengeluaran */
             --expense-bg: #faeaea;
             --expense-text: #c0392b;
             --expense-border: #e8a0a0;
@@ -34,7 +36,7 @@
 
         body {
             margin: 0;
-            background-color: #dbe4d3; /* Warna background luar mobile */
+            background-color: #dbe4d3; /* Background luar mobile */
             display: flex;
             justify-content: center;
         }
@@ -46,7 +48,7 @@
             background-color: var(--bg-app);
             min-height: 100vh;
             position: relative;
-            padding-bottom: 120px; /* Jarak agar form tidak tertutup nav bawah */
+            padding-bottom: 100px; /* Jarak untuk floating nav */
             overflow-x: hidden;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
@@ -57,6 +59,10 @@
             align-items: center;
             padding: 20px;
             gap: 15px;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-app);
+            z-index: 10;
         }
         .logo-box {
             width: 50px;
@@ -64,9 +70,7 @@
             background-color: var(--primary-dark);
             color: var(--white);
             border-radius: 14px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             font-size: 24px;
         }
         .header-text { flex: 1; }
@@ -77,114 +81,115 @@
             background: var(--white);
             border-radius: 12px;
             display: flex; justify-content: center; align-items: center;
-            color: var(--text-dark);
-            cursor: pointer;
+            color: var(--text-dark); cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        /* Card Umum */
-        .card {
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px 20px 20px;
+        }
+        .summary-card {
+            padding: 20px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .summary-card h4 { margin: 0; font-size: 13px; font-weight: 700; opacity: 0.9; }
+        .summary-card h2 { margin: 8px 0 0 0; font-size: 22px; font-weight: 800; }
+        .card-icon {
+            position: absolute;
+            top: 20px; right: 20px;
+            font-size: 24px; opacity: 0.2;
+        }
+        
+        .card-saldo {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            grid-column: span 2;
+        }
+        .card-in {
+            background-color: var(--white);
+            color: var(--primary-dark);
+            border: 1px solid var(--border-color);
+        }
+        .card-out {
+            background-color: var(--expense-bg);
+            color: var(--expense-text);
+            border: 1px solid var(--expense-border);
+        }
+
+        /* Chart Section */
+        .section-card {
             background: var(--white);
             border-radius: 24px;
             padding: 25px 20px;
             margin: 0 20px 20px 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-
-        /* Voice Card */
-        .voice-card { text-align: center; }
-        .card-title {
-            display: flex; align-items: center; gap: 10px;
-            font-weight: 700; color: var(--text-dark); font-size: 15px;
-            margin-bottom: 25px;
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
         }
-        .mic-btn {
-            width: 90px; height: 90px;
-            background-color: var(--primary-dark);
-            color: var(--white);
-            border: none; border-radius: 50%;
-            font-size: 32px;
-            cursor: pointer;
+        .section-header h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-dark); }
+        .btn-small {
+            background: var(--primary-light); color: var(--primary-dark);
+            border: none; padding: 6px 12px; border-radius: 12px;
+            font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+
+        .chart-container {
+            position: relative; height: 180px; width: 100%;
             display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 20px auto;
-            box-shadow: 0 8px 16px rgba(56, 93, 52, 0.3);
-            transition: transform 0.2s;
         }
-        .mic-btn:active { transform: scale(0.95); }
-        .mic-btn.listening { animation: pulse 1.5s infinite; background-color: #f39c12; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(243, 156, 18, 0); } 100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); } }
-        
-        .voice-card h3 { margin: 0 0 10px 0; font-size: 16px; color: var(--text-dark); }
-        .voice-card p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .chart-center-text {
+            position: absolute;
+            text-align: center;
+        }
+        .chart-center-text p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .chart-center-text h4 { margin: 0; font-size: 16px; color: var(--text-dark); font-weight: 800; }
 
-        /* Divider */
-        .divider {
+        .melon-info {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);
+            color: var(--primary-dark); font-weight: 800; font-size: 14px;
+        }
+
+        /* Transaction List */
+        .tx-item {
             display: flex; align-items: center;
-            margin: 0 20px 20px 20px;
-            color: var(--text-muted); font-size: 14px; font-weight: 600;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
         }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; height: 1px; background-color: var(--border-color);
+        .tx-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .tx-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px; margin-right: 15px;
         }
-        .divider span { padding: 0 15px; }
-
-        /* Manual Card */
-        .type-toggles {
-            display: flex; gap: 15px; margin-bottom: 25px;
-        }
-        .toggle-btn {
-            flex: 1; padding: 15px 10px;
-            border-radius: 12px; font-weight: 700; font-size: 14px;
-            cursor: pointer; border: 1px solid var(--border-color); background: var(--white);
-            color: var(--text-muted); display: flex; justify-content: center; align-items: center; gap: 8px;
-            transition: all 0.2s;
-        }
-        /* State Aktif Pemasukan */
-        .toggle-btn.active-in {
-            border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-light);
-        }
-        /* State Aktif Pengeluaran (Sesuai Gambar) */
-        .toggle-btn.active-out {
-            border-color: var(--expense-border); color: var(--expense-text); background: var(--expense-bg);
-        }
-
-        /* Form Isi */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
+        .icon-in { background-color: var(--primary-light); color: var(--primary-dark); }
+        .icon-out { background-color: var(--expense-bg); color: var(--expense-text); }
         
-        /* Kategori Pills */
-        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; }
-        .pill {
-            padding: 8px 16px; background: var(--bg-app); border: 1px solid var(--border-color);
-            border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer;
-            font-weight: 600; transition: 0.2s;
-        }
-        .pill.active { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-dark); }
+        .tx-details { flex: 1; }
+        .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); font-weight: 700; }
+        .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
         
-        .form-control {
-            width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px;
-            font-size: 15px; background: var(--bg-app); color: var(--text-dark);
-        }
-        .btn-submit {
-            width: 100%; padding: 16px; background: var(--primary-dark); color: white;
-            border: none; border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer;
-            margin-top: 10px;
-        }
+        .tx-amount { text-align: right; }
+        .tx-amount h4 { margin: 0; font-size: 15px; font-weight: 800; }
+        .amt-in { color: var(--primary-dark); }
+        .amt-out { color: var(--expense-text); }
 
-        /* Floating Bottom Nav Sesuai Referensi */
+        /* Floating Bottom Nav */
         .floating-nav {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 440px;
-            background: var(--white);
-            border-radius: 24px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            padding: 10px 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 40px); max-width: 440px;
+            background: var(--white); border-radius: 24px;
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            padding: 10px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             z-index: 100;
         }
         .nav-item {
@@ -193,10 +198,7 @@
             cursor: pointer; border-radius: 18px;
         }
         .nav-item i { font-size: 20px; }
-        .nav-item.active {
-            background-color: var(--primary-light);
-            color: var(--primary-dark);
-        }
+        .nav-item.active { background-color: var(--primary-light); color: var(--primary-dark); }
     </style>
 </head>
 <body>
@@ -217,72 +219,102 @@
         </div>
     </div>
 
-    <!-- Voice Card -->
-    <div class="card voice-card">
-        <div class="card-title">
-            <i class="fa-solid fa-volume-high"></i> Catat dengan Suara
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card card-saldo">
+            <i class="fa-solid fa-wallet card-icon"></i>
+            <h4>Saldo Tersedia</h4>
+            <h2>Rp 6.350.000</h2>
         </div>
-        <button class="mic-btn" id="micBtn" onclick="startVoiceBot()">
-            <i class="fa-solid fa-microphone"></i>
-        </button>
-        <h3 id="voice-status">Ketuk untuk mulai bicara</h3>
-        <p class="example">Contoh: "Beli pupuk NPK 500 ribu" atau "Jual melon 300 kilo harga 15 ribu per kilo"</p>
+        <div class="summary-card card-in">
+            <i class="fa-solid fa-arrow-up-right-dots card-icon"></i>
+            <h4>Pemasukan</h4>
+            <h2>Rp 8.500k</h2>
+        </div>
+        <div class="summary-card card-out">
+            <i class="fa-solid fa-arrow-down-right-dots card-icon"></i>
+            <h4>Pengeluaran</h4>
+            <h2>Rp 2.150k</h2>
+        </div>
     </div>
 
-    <!-- Divider -->
-    <div class="divider">
-        <span>atau isi manual</span>
+    <!-- Chart Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h3>Arus Kas Bulan Ini</h3>
+            <button class="btn-small"><i class="fa-regular fa-calendar"></i> Juli 2026</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="cashFlowChart"></canvas>
+            <div class="chart-center-text">
+                <p>Net Flow</p>
+                <h4>+Rp 6.35M</h4>
+            </div>
+        </div>
+        <div class="melon-info">
+            <i class="fa-solid fa-melon"></i> 🍈 Total Panen: 420 Kg
+        </div>
     </div>
 
-    <!-- Manual Form Card -->
-    <div class="card">
-        <!-- Toggle Jenis Transaksi -->
-        <div class="type-toggles">
-            <!-- Pemasukan -->
-            <button class="toggle-btn" id="btn-in" onclick="setJenis('pemasukan')">
-                <i class="fa-solid fa-arrow-up-right-dots"></i> Pemasukan
-            </button>
-            <!-- Pengeluaran (Sesuai referensi gambar, ini yg sedang aktif) -->
-            <button class="toggle-btn active-out" id="btn-out" onclick="setJenis('pengeluaran')">
-                <i class="fa-solid fa-arrow-down-right-dots"></i> Pengeluaran
-            </button>
+    <!-- Transaction List Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h3>Transaksi Terbaru</h3>
+            <span style="font-size: 12px; color: var(--primary-dark); font-weight: 700; cursor: pointer;">Lihat Semua</span>
         </div>
-
-        <div class="form-group">
-            <label>Kategori</label>
-            <div class="category-pills">
-                <span class="pill active" onclick="selectPill(this)">Tenaga Kerja</span>
-                <span class="pill" onclick="selectPill(this)">Listrik & Air</span>
-                <span class="pill" onclick="selectPill(this)">Peralatan & Greenhouse</span>
-                <span class="pill" onclick="selectPill(this)">Pupuk & Obat</span>
+        
+        <div class="tx-item">
+            <div class="tx-icon icon-in"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div class="tx-details">
+                <h4>Panen Tahap 2</h4>
+                <p>23 Jul 2026 • 220 Kg</p>
+            </div>
+            <div class="tx-amount">
+                <h4 class="amt-in">+Rp 4.500.000</h4>
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Nominal (Rp)</label>
-            <input type="number" id="input-nominal" class="form-control" placeholder="Contoh: 150000">
+        <div class="tx-item">
+            <div class="tx-icon icon-in"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div class="tx-details">
+                <h4>Panen Tahap 1</h4>
+                <p>21 Jul 2026 • 200 Kg</p>
+            </div>
+            <div class="tx-amount">
+                <h4 class="amt-in">+Rp 4.000.000</h4>
+            </div>
         </div>
 
-        <div class="form-group" id="berat-group" style="display: none;">
-            <label>Berat Panen Melon (Kg)</label>
-            <input type="number" id="input-berat" class="form-control" placeholder="Contoh: 200">
+        <div class="tx-item">
+            <div class="tx-icon icon-out"><i class="fa-solid fa-plug"></i></div>
+            <div class="tx-details">
+                <h4>Listrik & Air</h4>
+                <p>15 Jul 2026</p>
+            </div>
+            <div class="tx-amount">
+                <h4 class="amt-out">-Rp 650.000</h4>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label>Keterangan Tambahan</label>
-            <input type="text" id="input-ket" class="form-control" placeholder="Tulis rincian di sini...">
+        
+        <div class="tx-item">
+            <div class="tx-icon icon-out"><i class="fa-solid fa-flask"></i></div>
+            <div class="tx-details">
+                <h4>Pupuk AB Mix</h4>
+                <p>10 Jul 2026</p>
+            </div>
+            <div class="tx-amount">
+                <h4 class="amt-out">-Rp 1.500.000</h4>
+            </div>
         </div>
-
-        <button class="btn-submit" onclick="simpanManual()">Simpan Catatan</button>
     </div>
 
     <!-- Floating Bottom Navigation -->
     <div class="floating-nav">
-        <div class="nav-item">
+        <div class="nav-item active">
             <i class="fa-solid fa-house"></i>
             <span>Beranda</span>
         </div>
-        <div class="nav-item active">
+        <div class="nav-item">
             <i class="fa-solid fa-clipboard-list"></i>
             <span>Catat</span>
         </div>
@@ -299,114 +331,44 @@
 </div>
 
 <script>
-    let jenisTransaksi = 'pengeluaran'; // Default sesuai gambar
-
-    // Fungsi Toggle Pemasukan/Pengeluaran
-    function setJenis(jenis) {
-        jenisTransaksi = jenis;
-        const btnIn = document.getElementById('btn-in');
-        const btnOut = document.getElementById('btn-out');
-        const beratGroup = document.getElementById('berat-group');
-
-        // Reset class
-        btnIn.className = 'toggle-btn';
-        btnOut.className = 'toggle-btn';
-
-        if (jenis === 'pemasukan') {
-            btnIn.classList.add('active-in');
-            beratGroup.style.display = 'block'; // Tampilkan input berat jika panen
-        } else {
-            btnOut.classList.add('active-out');
-            beratGroup.style.display = 'none';
-        }
-    }
-
-    // Fungsi klik Kategori Pill
-    function selectPill(element) {
-        // Hapus class active dari semua pill
-        document.querySelectorAll('.pill').forEach(el => el.classList.remove('active'));
-        // Tambahkan ke pill yang diklik
-        element.classList.add('active');
+    // Konfigurasi Chart.js (Grafik Donat)
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('cashFlowChart').getContext('2d');
         
-        // Memasukkan teks pill ke keterangan
-        document.getElementById('input-ket').value = element.innerText;
-    }
-
-    // Fungsi Voice Chat Bot Sederhana
-    function startVoiceBot() {
-        if (!('webkitSpeechRecognition' in window)) {
-            alert('Browser Anda tidak mendukung fitur suara. Gunakan Chrome.');
-            return;
-        }
-
-        const micBtn = document.getElementById('micBtn');
-        const statusText = document.getElementById('voice-status');
-        const recognition = new webkitSpeechRecognition();
-        
-        recognition.lang = 'id-ID';
-
-        recognition.onstart = () => {
-            micBtn.classList.add('listening');
-            statusText.innerText = 'Mendengarkan... Silakan bicara';
-            statusText.style.color = '#f39c12';
-        };
-
-        recognition.onend = () => {
-            micBtn.classList.remove('listening');
-            statusText.innerText = 'Ketuk untuk mulai bicara';
-            statusText.style.color = 'var(--text-dark)';
-        };
-
-        recognition.onresult = (event) => {
-            const hasil = event.results[0][0].transcript.toLowerCase();
-            
-            // Logika NLP Sederhana membedah kalimat
-            if (hasil.includes('jual') || hasil.includes('panen') || hasil.includes('masuk')) {
-                setJenis('pemasukan');
-            } else if (hasil.includes('beli') || hasil.includes('bayar') || hasil.includes('keluar')) {
-                setJenis('pengeluaran');
-            }
-
-            // Tangkap Angka
-            const angkaArr = hasil.match(/\d+/g);
-            if (angkaArr) {
-                let pengali = 1;
-                if (hasil.includes('juta')) pengali = 1000000;
-                else if (hasil.includes('ribu')) pengali = 1000;
-
-                const angka1 = parseInt(angkaArr[0]);
-                document.getElementById('input-nominal').value = angka1 * pengali;
-                
-                if(angkaArr.length > 1) {
-                    document.getElementById('input-berat').value = (angka1 < parseInt(angkaArr[1])) ? angka1 : parseInt(angkaArr[1]);
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pemasukan', 'Pengeluaran'],
+                datasets: [{
+                    data: [8500000, 2150000],
+                    backgroundColor: [
+                        '#385d34', // Hijau tua (Sesuai primary-dark)
+                        '#e8a0a0'  // Merah muda (Sesuai expense-border)
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%', // Ketebalan donat
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) { label += ': '; }
+                                label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(context.raw);
+                                return label;
+                            }
+                        }
+                    }
                 }
             }
-
-            document.getElementById('input-ket').value = hasil;
-            
-            // Hapus seleksi pill
-            document.querySelectorAll('.pill').forEach(el => el.classList.remove('active'));
-            
-            alert(`Suara tertangkap: "${hasil}"\nData otomatis diisi ke formulir manual di bawah.`);
-            
-            // Gulir ke form manual
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        };
-
-        recognition.start();
-    }
-
-    function simpanManual() {
-        const nominal = document.getElementById('input-nominal').value;
-        if(!nominal) {
-            alert('Harap isi nominal terlebih dahulu!');
-            return;
-        }
-        alert('Data berhasil dicatat ke dalam buku kas digital!');
-        document.getElementById('input-nominal').value = '';
-        document.getElementById('input-berat').value = '';
-        document.getElementById('input-ket').value = '';
-    }
+        });
+    });
 </script>
 
 </body>
