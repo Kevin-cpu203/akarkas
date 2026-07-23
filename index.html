@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas Greenhouse - Beranda</title>
+    <title>Kas Greenhouse Melon - Smart App</title>
     
-    <!-- FontAwesome untuk Ikon -->
+    <!-- FontAwesome & Chart.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js untuk Grafik Donut -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Palet Warna Earth-Tone (Kas Greenhouse Melon) */
+            /* Tema Beranda (Gambar 1) */
+            --teal: #17a2b8;
+            --green: #2b7a5c;
+            --orange: #e67e22;
+            
+            /* Tema Catat & Umum (Gambar 2) */
             --bg-app: #eef3e6;
             --primary-dark: #385d34;
             --primary-light: #e4f0d9;
@@ -23,353 +26,459 @@
             --white: #ffffff;
             --border-color: #d1d9ce;
             
-            /* Warna Pengeluaran */
             --expense-bg: #faeaea;
             --expense-text: #c0392b;
             --expense-border: #e8a0a0;
         }
 
-        * {
-            box-sizing: border-box;
-            font-family: 'Nunito', sans-serif;
-        }
+        * { box-sizing: border-box; font-family: 'Nunito', sans-serif; }
+        body { margin: 0; background-color: #dbe4d3; display: flex; justify-content: center; }
 
-        body {
-            margin: 0;
-            background-color: #dbe4d3; /* Background luar mobile */
-            display: flex;
-            justify-content: center;
-        }
-
-        /* Container Mobile */
         .app-container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--bg-app);
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 100px; /* Jarak untuk floating nav */
-            overflow-x: hidden;
+            width: 100%; max-width: 480px; background-color: var(--bg-app);
+            min-height: 100vh; position: relative; overflow-x: hidden;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* Header */
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            background-color: var(--bg-app);
-            z-index: 10;
-        }
-        .logo-box {
-            width: 50px;
-            height: 50px;
-            background-color: var(--primary-dark);
-            color: var(--white);
-            border-radius: 14px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 24px;
-        }
-        .header-text { flex: 1; }
-        .header-text h1 { margin: 0; font-size: 18px; color: var(--text-dark); font-weight: 800; }
-        .header-text p { margin: 3px 0 0 0; font-size: 13px; color: var(--text-muted); }
-        .menu-btn {
-            width: 40px; height: 40px;
-            background: var(--white);
-            border-radius: 12px;
-            display: flex; justify-content: center; align-items: center;
-            color: var(--text-dark); cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
+        /* --- SISTEM NAVIGASI (SPA) --- */
+        .view-section { display: none; padding-bottom: 120px; animation: fadeIn 0.3s; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Summary Cards */
-        .summary-cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 0 20px 20px 20px;
-        }
-        .summary-card {
-            padding: 20px;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-        .summary-card h4 { margin: 0; font-size: 13px; font-weight: 700; opacity: 0.9; }
-        .summary-card h2 { margin: 8px 0 0 0; font-size: 22px; font-weight: 800; }
-        .card-icon {
-            position: absolute;
-            top: 20px; right: 20px;
-            font-size: 24px; opacity: 0.2;
-        }
-        
-        .card-saldo {
-            background-color: var(--primary-dark);
-            color: var(--white);
-            grid-column: span 2;
-        }
-        .card-in {
-            background-color: var(--white);
-            color: var(--primary-dark);
-            border: 1px solid var(--border-color);
-        }
-        .card-out {
-            background-color: var(--expense-bg);
-            color: var(--expense-text);
-            border: 1px solid var(--expense-border);
-        }
-
-        /* Chart Section */
-        .section-card {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 25px 20px;
-            margin: 0 20px 20px 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-        .section-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
-        }
-        .section-header h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-dark); }
-        .btn-small {
-            background: var(--primary-light); color: var(--primary-dark);
-            border: none; padding: 6px 12px; border-radius: 12px;
-            font-size: 12px; font-weight: 700; cursor: pointer;
-        }
-
-        .chart-container {
-            position: relative; height: 180px; width: 100%;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .chart-center-text {
-            position: absolute;
-            text-align: center;
-        }
-        .chart-center-text p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .chart-center-text h4 { margin: 0; font-size: 16px; color: var(--text-dark); font-weight: 800; }
-
-        .melon-info {
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-            margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);
-            color: var(--primary-dark); font-weight: 800; font-size: 14px;
-        }
-
-        /* Transaction List */
-        .tx-item {
-            display: flex; align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .tx-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .tx-icon {
-            width: 42px; height: 42px; border-radius: 12px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18px; margin-right: 15px;
-        }
-        .icon-in { background-color: var(--primary-light); color: var(--primary-dark); }
-        .icon-out { background-color: var(--expense-bg); color: var(--expense-text); }
-        
-        .tx-details { flex: 1; }
-        .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); font-weight: 700; }
-        .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
-        
-        .tx-amount { text-align: right; }
-        .tx-amount h4 { margin: 0; font-size: 15px; font-weight: 800; }
-        .amt-in { color: var(--primary-dark); }
-        .amt-out { color: var(--expense-text); }
-
-        /* Floating Bottom Nav */
+        /* Floating Nav */
         .floating-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: calc(100% - 40px); max-width: 440px;
             background: var(--white); border-radius: 24px;
             display: grid; grid-template-columns: repeat(4, 1fr);
-            padding: 10px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            z-index: 100;
+            padding: 10px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); z-index: 1000;
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 12px 0; color: var(--text-muted); font-size: 11px; font-weight: 700; gap: 6px;
-            cursor: pointer; border-radius: 18px;
+            padding: 10px 0; color: var(--text-muted); font-size: 11px; font-weight: 700; gap: 6px;
+            cursor: pointer; border-radius: 18px; transition: 0.2s;
         }
         .nav-item i { font-size: 20px; }
         .nav-item.active { background-color: var(--primary-light); color: var(--primary-dark); }
+
+        /* --- BERANDA (GAMBAR 1) --- */
+        .header-beranda {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px;
+            background: var(--white); border-bottom: 1px solid var(--border-color);
+        }
+        .header-beranda h2 { margin: 0; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+        .btn-entri { background: var(--green); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; border: none; cursor: pointer; }
+        
+        .filter-bar { display: flex; gap: 10px; padding: 15px 20px; }
+        .filter-select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: var(--white); color: var(--text-muted); }
+
+        .dashboard-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px 20px 20px; }
+        .d-card { padding: 15px 10px; border-radius: 12px; color: white; position: relative; }
+        .d-card h4 { margin: 0; font-size: 11px; font-weight: 600; opacity: 0.9; }
+        .d-card h2 { margin: 5px 0 0 0; font-size: 16px; font-weight: 800; }
+        .d-card i { position: absolute; top: 10px; right: 10px; opacity: 0.4; }
+        .bg-teal { background: var(--teal); }
+        .bg-green { background: var(--green); }
+        .bg-orange { background: var(--orange); }
+
+        .chart-box { background: white; margin: 0 20px; padding: 20px; border-radius: 15px; text-align: center; position: relative; }
+        .chart-box h3 { text-align: left; margin-top: 0; font-size: 15px; color: var(--text-dark); }
+        .donut-container { height: 200px; position: relative; }
+        .tanam-aku { width: 60px; position: absolute; bottom: -10px; right: 10px; opacity: 0.8; }
+
+        /* --- CATAT (GAMBAR 2) --- */
+        .header-catat { display: flex; align-items: center; padding: 20px; gap: 15px; }
+        .logo-box { width: 50px; height: 50px; background: var(--primary-dark); color: white; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+        .c-card { background: var(--white); border-radius: 24px; padding: 25px 20px; margin: 0 20px 20px 20px; }
+        .mic-btn { width: 90px; height: 90px; background: var(--primary-dark); color: white; border: none; border-radius: 50%; font-size: 32px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 16px rgba(56, 93, 52, 0.3); }
+        
+        .type-toggles { display: flex; gap: 15px; margin-bottom: 25px; }
+        .toggle-btn { flex: 1; padding: 15px 10px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .toggle-btn.active-in { border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-light); }
+        .toggle-btn.active-out { border-color: var(--expense-border); color: var(--expense-text); background: var(--expense-bg); }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
+        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+        .pill { padding: 8px 16px; background: var(--bg-app); border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-weight: 600; }
+        .pill.active { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-dark); }
+        .form-control { width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 15px; }
+        .btn-submit { width: 100%; padding: 16px; background: var(--primary-dark); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        /* --- RIWAYAT --- */
+        .list-container { padding: 0 20px; }
+        .tx-item { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .tx-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 18px; margin-right: 15px; }
+        .i-in { background: var(--primary-light); color: var(--primary-dark); }
+        .i-out { background: var(--expense-bg); color: var(--expense-text); }
+        .tx-details { flex: 1; }
+        .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); }
+        .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
+        .tx-amount { text-align: right; }
+        .btn-del { color: #e74c3c; background: none; border: none; padding: 5px; cursor: pointer; }
+
+        /* --- ANALISIS --- */
+        .analisis-card { background: white; padding: 25px 20px; border-radius: 24px; margin: 0 20px 20px 20px; text-align: center; }
+        .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 800; font-size: 18px; margin-bottom: 15px; }
+        .status-surplus { background: var(--primary-light); color: var(--primary-dark); }
+        .status-minus { background: var(--expense-bg); color: var(--expense-text); }
+        .analisis-text { font-size: 14px; color: var(--text-dark); line-height: 1.6; text-align: left; padding: 15px; background: var(--bg-app); border-radius: 12px; }
+        .bar-container { height: 200px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    
-    <!-- Header -->
-    <div class="header">
-        <div class="logo-box">
-            <i class="fa-solid fa-seedling"></i>
-        </div>
-        <div class="header-text">
-            <h1>Kas Greenhouse Melon</h1>
-            <p>Buku kas digital gapoktan</p>
-        </div>
-        <div class="menu-btn">
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-        </div>
-    </div>
 
-    <!-- Summary Cards -->
-    <div class="summary-cards">
-        <div class="summary-card card-saldo">
-            <i class="fa-solid fa-wallet card-icon"></i>
-            <h4>Saldo Tersedia</h4>
-            <h2>Rp 6.350.000</h2>
-        </div>
-        <div class="summary-card card-in">
-            <i class="fa-solid fa-arrow-up-right-dots card-icon"></i>
-            <h4>Pemasukan</h4>
-            <h2>Rp 8.500k</h2>
-        </div>
-        <div class="summary-card card-out">
-            <i class="fa-solid fa-arrow-down-right-dots card-icon"></i>
-            <h4>Pengeluaran</h4>
-            <h2>Rp 2.150k</h2>
-        </div>
-    </div>
-
-    <!-- Chart Section -->
-    <div class="section-card">
-        <div class="section-header">
-            <h3>Arus Kas Bulan Ini</h3>
-            <button class="btn-small"><i class="fa-regular fa-calendar"></i> Juli 2026</button>
-        </div>
-        <div class="chart-container">
-            <canvas id="cashFlowChart"></canvas>
-            <div class="chart-center-text">
-                <p>Net Flow</p>
-                <h4>+Rp 6.35M</h4>
-            </div>
-        </div>
-        <div class="melon-info">
-            <i class="fa-solid fa-melon"></i> 🍈 Total Panen: 420 Kg
-        </div>
-    </div>
-
-    <!-- Transaction List Section -->
-    <div class="section-card">
-        <div class="section-header">
-            <h3>Transaksi Terbaru</h3>
-            <span style="font-size: 12px; color: var(--primary-dark); font-weight: 700; cursor: pointer;">Lihat Semua</span>
+    <!-- ==================== MENU 1: BERANDA ==================== -->
+    <div id="view-beranda" class="view-section active">
+        <div class="header-beranda">
+            <h2><i class="fa-solid fa-chart-simple" style="color:var(--green)"></i> Dashboard</h2>
+            <button class="btn-entri" onclick="switchTab('view-catat')">+ Entri Baru</button>
         </div>
         
-        <div class="tx-item">
-            <div class="tx-icon icon-in"><i class="fa-solid fa-sack-dollar"></i></div>
-            <div class="tx-details">
-                <h4>Panen Tahap 2</h4>
-                <p>23 Jul 2026 • 220 Kg</p>
+        <div class="filter-bar">
+            <select class="filter-select"><option>Bulan Ini (Juli)</option></select>
+            <select class="filter-select"><option>Category (All)</option></select>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="d-card bg-teal">
+                <i class="fa-solid fa-wallet"></i>
+                <h4>Saldo</h4>
+                <h2 id="b-saldo">Rp 0</h2>
             </div>
-            <div class="tx-amount">
-                <h4 class="amt-in">+Rp 4.500.000</h4>
+            <div class="d-card bg-green">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <h4>Pemasukan</h4>
+                <h2 id="b-in">Rp 0</h2>
+            </div>
+            <div class="d-card bg-orange">
+                <i class="fa-solid fa-receipt"></i>
+                <h4>Pengeluaran</h4>
+                <h2 id="b-out">Rp 0</h2>
             </div>
         </div>
 
-        <div class="tx-item">
-            <div class="tx-icon icon-in"><i class="fa-solid fa-sack-dollar"></i></div>
-            <div class="tx-details">
-                <h4>Panen Tahap 1</h4>
-                <p>21 Jul 2026 • 200 Kg</p>
+        <div class="chart-box">
+            <h3>Pemasukan vs Pengeluaran <span style="float:right; color:#ccc;"><i class="fa-solid fa-clock-rotate-left"></i></span></h3>
+            <div class="donut-container">
+                <canvas id="berandaChart"></canvas>
             </div>
-            <div class="tx-amount">
-                <h4 class="amt-in">+Rp 4.000.000</h4>
+            <div style="font-size:12px; margin-top:10px;">
+                <span style="color:var(--green)">● Income</span> &nbsp; <span style="color:var(--orange)">● Expense</span>
             </div>
-        </div>
-
-        <div class="tx-item">
-            <div class="tx-icon icon-out"><i class="fa-solid fa-plug"></i></div>
-            <div class="tx-details">
-                <h4>Listrik & Air</h4>
-                <p>15 Jul 2026</p>
-            </div>
-            <div class="tx-amount">
-                <h4 class="amt-out">-Rp 650.000</h4>
-            </div>
-        </div>
-        
-        <div class="tx-item">
-            <div class="tx-icon icon-out"><i class="fa-solid fa-flask"></i></div>
-            <div class="tx-details">
-                <h4>Pupuk AB Mix</h4>
-                <p>10 Jul 2026</p>
-            </div>
-            <div class="tx-amount">
-                <h4 class="amt-out">-Rp 1.500.000</h4>
+            <!-- Cloche Tanam Aku (Text Representation) -->
+            <div class="tanam-aku" style="font-size: 10px; font-weight: bold; color: var(--green); text-align: center; background: #eef3e6; padding: 5px; border-radius: 10px; border: 1px solid #ccc;">
+                🌱<br>Tanam aku!
             </div>
         </div>
     </div>
 
-    <!-- Floating Bottom Navigation -->
+    <!-- ==================== MENU 2: CATAT ==================== -->
+    <div id="view-catat" class="view-section">
+        <div class="header-catat">
+            <div class="logo-box"><i class="fa-solid fa-seedling"></i></div>
+            <div>
+                <h1 style="margin:0; font-size:18px; font-weight:800; color:var(--text-dark);">Kas Greenhouse Melon</h1>
+                <p style="margin:0; font-size:13px; color:var(--text-muted);">Buku kas digital gapoktan</p>
+            </div>
+        </div>
+
+        <div class="c-card" style="text-align: center;">
+            <div style="text-align:left; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-volume-high"></i> Catat dengan Suara</div>
+            <button class="mic-btn" onclick="startVoiceBot()"><i class="fa-solid fa-microphone"></i></button>
+            <h3 style="margin:0 0 10px 0; font-size:16px;">Ketuk untuk mulai bicara</h3>
+            <p style="font-size:12px; color:var(--text-muted);">Contoh: "Beli pupuk NPK 500 ribu"</p>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px; color: var(--text-muted); font-size: 14px;">--- atau isi manual ---</div>
+
+        <div class="c-card">
+            <div class="type-toggles">
+                <button class="toggle-btn" id="btn-in" onclick="setJenis('pemasukan')"><i class="fa-solid fa-arrow-up-right-dots"></i> Pemasukan</button>
+                <button class="toggle-btn active-out" id="btn-out" onclick="setJenis('pengeluaran')"><i class="fa-solid fa-arrow-down-right-dots"></i> Pengeluaran</button>
+            </div>
+
+            <div class="form-group">
+                <label>Kategori</label>
+                <div class="category-pills">
+                    <span class="pill" onclick="selectPill(this)">Panen Melon</span>
+                    <span class="pill active" onclick="selectPill(this)">Pupuk & Obat</span>
+                    <span class="pill" onclick="selectPill(this)">Tenaga Kerja</span>
+                    <span class="pill" onclick="selectPill(this)">Listrik & Air</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="hidden" id="input-kategori" value="Pupuk & Obat">
+                <label>Nominal (Rp)</label>
+                <input type="number" id="input-nominal" class="form-control" placeholder="150000">
+            </div>
+            
+            <div class="form-group" id="group-berat" style="display:none;">
+                <label>Berat Melon (Kg)</label>
+                <input type="number" id="input-berat" class="form-control" placeholder="200">
+            </div>
+
+            <button class="btn-submit" onclick="simpanManual()">Simpan Catatan</button>
+        </div>
+    </div>
+
+    <!-- ==================== MENU 3: RIWAYAT ==================== -->
+    <div id="view-riwayat" class="view-section">
+        <div class="header-beranda" style="margin-bottom: 20px;">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2>
+        </div>
+        <div class="list-container" id="riwayat-list">
+            <!-- Data riwayat masuk ke sini -->
+        </div>
+    </div>
+
+    <!-- ==================== MENU 4: ANALISIS ==================== -->
+    <div id="view-analisis" class="view-section">
+        <div class="header-beranda" style="margin-bottom: 20px;">
+            <h2><i class="fa-solid fa-chart-line"></i> Analisis Keuangan</h2>
+        </div>
+        
+        <div class="analisis-card">
+            <h4 style="margin:0 0 10px 0; color:var(--text-muted);">Status Bulan Ini</h4>
+            <div id="status-badge" class="status-badge status-surplus">SURPLUS</div>
+            
+            <div class="analisis-text" id="teks-analisis">
+                Memuat analisis...
+            </div>
+            
+            <h4 style="margin:25px 0 10px 0; text-align:left;">Grafik Kategori Pengeluaran</h4>
+            <div class="bar-container">
+                <canvas id="analisisChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FLOATING NAV ==================== -->
     <div class="floating-nav">
-        <div class="nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <span>Beranda</span>
+        <div class="nav-item active" onclick="switchTab('view-beranda', this)">
+            <i class="fa-solid fa-house"></i><span>Beranda</span>
         </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-clipboard-list"></i>
-            <span>Catat</span>
+        <div class="nav-item" onclick="switchTab('view-catat', this)">
+            <i class="fa-solid fa-clipboard-list"></i><span>Catat</span>
         </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <span>Riwayat</span>
+        <div class="nav-item" onclick="switchTab('view-riwayat', this)">
+            <i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span>
         </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Analisis</span>
+        <div class="nav-item" onclick="switchTab('view-analisis', this)">
+            <i class="fa-solid fa-chart-pie"></i><span>Analisis</span>
         </div>
     </div>
 
 </div>
 
 <script>
-    // Konfigurasi Chart.js (Grafik Donat)
-    document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('cashFlowChart').getContext('2d');
+    // --- DATABASE SEMENTARA (State) ---
+    let transaksi = [
+        { id: 1, jenis: 'pemasukan', kategori: 'Panen Melon', nominal: 5000000, berat: 250, tanggal: '20 Jul 2026' },
+        { id: 2, jenis: 'pengeluaran', kategori: 'Pupuk & Obat', nominal: 1200000, berat: 0, tanggal: '18 Jul 2026' },
+        { id: 3, jenis: 'pengeluaran', kategori: 'Listrik & Air', nominal: 300000, berat: 0, tanggal: '15 Jul 2026' }
+    ];
+
+    let jenisAktif = 'pengeluaran';
+    let bChart, aChart;
+
+    const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
+    // --- LOGIKA SPA (Switch Tab) ---
+    function switchTab(tabId, navElement = null) {
+        // Sembunyikan semua section
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        // Hapus warna aktif dari semua menu bawah
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         
-        new Chart(ctx, {
+        // Tampilkan yang dipilih
+        document.getElementById(tabId).classList.add('active');
+        if(navElement) navElement.classList.add('active');
+        else {
+            // Jika dipanggil dari tombol (bukan nav), sesuaikan nav-nya
+            const navs = document.querySelectorAll('.nav-item');
+            if(tabId === 'view-catat') navs[1].classList.add('active');
+            if(tabId === 'view-beranda') navs[0].classList.add('active');
+        }
+
+        // Update data khusus saat tab dibuka
+        if(tabId === 'view-beranda') renderBeranda();
+        if(tabId === 'view-riwayat') renderRiwayat();
+        if(tabId === 'view-analisis') renderAnalisis();
+    }
+
+    // --- FUNGSI HALAMAN BERANDA ---
+    function renderBeranda() {
+        let inTotal = 0, outTotal = 0;
+        transaksi.forEach(t => { if(t.jenis === 'pemasukan') inTotal += t.nominal; else outTotal += t.nominal; });
+        
+        document.getElementById('b-saldo').innerText = formatRp(inTotal - outTotal);
+        document.getElementById('b-in').innerText = formatRp(inTotal);
+        document.getElementById('b-out').innerText = formatRp(outTotal);
+
+        // Chart Donut
+        const ctx = document.getElementById('berandaChart').getContext('2d');
+        if(bChart) bChart.destroy();
+        bChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Pemasukan', 'Pengeluaran'],
+                labels: ['Income', 'Expense'],
                 datasets: [{
-                    data: [8500000, 2150000],
-                    backgroundColor: [
-                        '#385d34', // Hijau tua (Sesuai primary-dark)
-                        '#e8a0a0'  // Merah muda (Sesuai expense-border)
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
+                    data: [inTotal || 1, outTotal || 1], // fallback agar chart tidak hilang
+                    backgroundColor: ['#2b7a5c', '#e67e22'],
+                    borderWidth: 0, hoverOffset: 4
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%', // Ketebalan donat
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) { label += ': '; }
-                                label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(context.raw);
-                                return label;
-                            }
-                        }
-                    }
-                }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+        });
+    }
+
+    // --- FUNGSI HALAMAN CATAT ---
+    function setJenis(jenis) {
+        jenisAktif = jenis;
+        const bIn = document.getElementById('btn-in'); const bOut = document.getElementById('btn-out');
+        bIn.className = 'toggle-btn'; bOut.className = 'toggle-btn';
+        
+        if (jenis === 'pemasukan') {
+            bIn.classList.add('active-in');
+            document.getElementById('group-berat').style.display = 'block';
+        } else {
+            bOut.classList.add('active-out');
+            document.getElementById('group-berat').style.display = 'none';
+        }
+    }
+
+    function selectPill(el) {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('input-kategori').value = el.innerText;
+    }
+
+    function simpanManual() {
+        const nominal = parseInt(document.getElementById('input-nominal').value);
+        if(!nominal) return alert('Isi nominal uangnya!');
+        
+        transaksi.push({
+            id: Date.now(),
+            jenis: jenisAktif,
+            kategori: document.getElementById('input-kategori').value,
+            nominal: nominal,
+            berat: parseInt(document.getElementById('input-berat').value) || 0,
+            tanggal: new Date().toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'})
+        });
+        
+        document.getElementById('input-nominal').value = '';
+        document.getElementById('input-berat').value = '';
+        alert('Tersimpan!');
+        switchTab('view-beranda'); // Balik ke dashboard
+    }
+
+    // --- FUNGSI HALAMAN RIWAYAT ---
+    function renderRiwayat() {
+        const list = document.getElementById('riwayat-list');
+        list.innerHTML = '';
+        
+        [...transaksi].reverse().forEach(t => {
+            const isMasuk = t.jenis === 'pemasukan';
+            list.innerHTML += `
+                <div class="tx-item">
+                    <div class="tx-icon ${isMasuk ? 'i-in' : 'i-out'}"><i class="fa-solid ${isMasuk ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></div>
+                    <div class="tx-details">
+                        <h4>${t.kategori}</h4>
+                        <p>${t.tanggal} ${t.berat > 0 ? '| 🍈 '+t.berat+'Kg' : ''}</p>
+                    </div>
+                    <div class="tx-amount">
+                        <h4 style="color: ${isMasuk ? 'var(--primary-dark)' : 'var(--expense-text)'}">${isMasuk ? '+' : '-'}${formatRp(t.nominal)}</h4>
+                        <button class="btn-del" onclick="hapusTx(${t.id})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function hapusTx(id) {
+        if(confirm('Hapus transaksi ini?')) {
+            transaksi = transaksi.filter(t => t.id !== id);
+            renderRiwayat();
+        }
+    }
+
+    // --- FUNGSI HALAMAN ANALISIS ---
+    function renderAnalisis() {
+        let inTotal = 0, outTotal = 0;
+        let outCategories = {};
+
+        transaksi.forEach(t => {
+            if(t.jenis === 'pemasukan') inTotal += t.nominal;
+            else {
+                outTotal += t.nominal;
+                outCategories[t.kategori] = (outCategories[t.kategori] || 0) + t.nominal;
             }
         });
-    });
-</script>
 
+        const saldo = inTotal - outTotal;
+        const badge = document.getElementById('status-badge');
+        const teks = document.getElementById('teks-analisis');
+
+        // Mencari pengeluaran terbesar
+        let maxCat = '-', maxVal = 0;
+        for(let cat in outCategories) {
+            if(outCategories[cat] > maxVal) { maxVal = outCategories[cat]; maxCat = cat; }
+        }
+
+        if(saldo >= 0) {
+            badge.className = 'status-badge status-surplus'; badge.innerText = 'SURPLUS';
+            teks.innerHTML = `<strong>Kinerja Bagus!</strong> Keuangan Gapoktan sedang Surplus sebesar <b>${formatRp(saldo)}</b>.<br><br>Pemasukan utama berhasil menutupi operasional. Fokuskan pemantauan pada <b>${maxCat}</b> karena ini menyedot dana terbesar bulan ini sebesar ${formatRp(maxVal)}.`;
+        } else {
+            badge.className = 'status-badge status-minus'; badge.innerText = 'MINUS / DEFISIT';
+            teks.innerHTML = `<strong>Perhatian:</strong> Arus kas minus <b>${formatRp(Math.abs(saldo))}</b>.<br><br>Ini wajar jika sedang dalam fase tanam dan belum panen. Kebocoran terbesar ada di pos <b>${maxCat}</b> (${formatRp(maxVal)}). Coba efisiensikan biaya di sektor tersebut.`;
+        }
+
+        // Chart Bar Analisis (Top Pengeluaran)
+        const ctx = document.getElementById('analisisChart').getContext('2d');
+        if(aChart) aChart.destroy();
+        aChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(outCategories),
+                datasets: [{
+                    label: 'Total Rp',
+                    data: Object.values(outCategories),
+                    backgroundColor: '#e8a0a0',
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    }
+
+    // --- FUNGSI VOICE (Web Speech API) ---
+    function startVoiceBot() {
+        if (!('webkitSpeechRecognition' in window)) return alert('Gunakan Chrome untuk fitur suara.');
+        const rec = new webkitSpeechRecognition();
+        rec.lang = 'id-ID';
+        rec.onstart = () => console.log('Mendengarkan...');
+        rec.onresult = (e) => {
+            const hasil = e.results[0][0].transcript.toLowerCase();
+            if(hasil.includes('jual') || hasil.includes('panen')) setJenis('pemasukan');
+            else setJenis('pengeluaran');
+            
+            const angkaArr = hasil.match(/\d+/g);
+            if(angkaArr) {
+                let pengali = hasil.includes('juta') ? 1000000 : (hasil.includes('ribu') ? 1000 : 1);
+                document.getElementById('input-nominal').value = parseInt(angkaArr[0]) * pengali;
+            }
+            alert(`Sistem merekam: "${hasil}".\nCek form manual untuk menyimpan.`);
+        };
+        rec.start();
+    }
+
+    // Inisialisasi awal saat pertama buka
+    window.onload = () => { renderBeranda(); };
+
+</script>
 </body>
 </html>
