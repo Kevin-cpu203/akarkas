@@ -1,1186 +1,365 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Home, ClipboardList, History, TrendingUp, Mic, Loader2, Trash2, X, Check,
-  Sprout, Wallet, ArrowUpRight, ArrowDownRight, AlertTriangle, Plus,
-  Sparkles, RefreshCw, MoreVertical, Volume2, Pencil, Scale, Share2,
-} from "lucide-react";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie,
-  Cell, CartesianGrid,
-} from "recharts";
-
-/* ---------------------------------------------------------------
-   Design tokens & base styles — greenhouse / melon palette
-   Sage-glass background, deep vine green, cantaloupe gold accent,
-   rounded warm display type paired with a clean legible body face
-   and a tabular mono face for money so figures are easy to scan.
----------------------------------------------------------------- */
-const STYLES = `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
-
-.kgm-root {
-  --bg: #EAF1E3;
-  --surface: #FFFFFF;
-  --surface-2: #F4F7EF;
-  --ink: #23301C;
-  --muted: #66735A;
-  --border: #DCE5D2;
-  --primary: #3A6B35;
-  --primary-dark: #24451F;
-  --primary-light: #E4EFDE;
-  --accent: #E8A33D;
-  --accent-dark: #B87F22;
-  --income: #3F8C46;
-  --income-light: #E2F1E1;
-  --expense: #C1443C;
-  --expense-light: #FAE6E3;
-  --warn: #D9A441;
-  --warn-light: #FBF0DB;
-  --radius-lg: 22px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-  font-family: 'Inter', system-ui, sans-serif;
-  color: var(--ink);
-  background: var(--bg);
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: 18px 12px 90px;
-}
-.kgm-root *, .kgm-root *::before, .kgm-root *::after { box-sizing: border-box; }
-.kgm-app {
-  width: 100%;
-  max-width: 460px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  position: relative;
-}
-.kgm-display { font-family: 'Baloo 2', system-ui, sans-serif; }
-.kgm-mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
-
-.kgm-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 4px 0;
-}
-.kgm-brand { display: flex; align-items: center; gap: 10px; }
-.kgm-brand-icon {
-  width: 42px; height: 42px; border-radius: 13px; background: var(--primary);
-  display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
-  box-shadow: 0 3px 0 var(--primary-dark);
-}
-.kgm-brand-title { font-family: 'Baloo 2'; font-weight: 700; font-size: 18px; line-height: 1.15; }
-.kgm-brand-sub { font-size: 12.5px; color: var(--muted); font-weight: 500; }
-.kgm-icon-btn {
-  width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid var(--border);
-  background: var(--surface); display: flex; align-items: center; justify-content: center;
-  color: var(--ink); cursor: pointer;
-}
-.kgm-icon-btn:hover { background: var(--surface-2); }
-
-.kgm-card {
-  background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border);
-  padding: 18px; box-shadow: 0 2px 0 rgba(35,48,28,0.03);
-}
-.kgm-card-title {
-  font-family: 'Baloo 2'; font-weight: 700; font-size: 15.5px; margin: 0 0 12px;
-  display: flex; align-items: center; gap: 8px; color: var(--primary-dark);
-}
-
-.kgm-balance-label { font-size: 13px; color: var(--muted); font-weight: 600; }
-.kgm-balance-amount { font-size: 32px; font-weight: 700; margin-top: 2px; letter-spacing: -0.5px; }
-
-.kgm-stat-row { display: flex; gap: 10px; }
-.kgm-stat {
-  flex: 1; border-radius: var(--radius-md); padding: 13px 14px; display: flex; flex-direction: column; gap: 6px;
-}
-.kgm-stat.income { background: var(--income-light); }
-.kgm-stat.expense { background: var(--expense-light); }
-.kgm-stat-top { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; }
-.kgm-stat.income .kgm-stat-top { color: var(--income); }
-.kgm-stat.expense .kgm-stat-top { color: var(--expense); }
-.kgm-stat-amount { font-size: 17px; font-weight: 700; }
-
-.kgm-btn {
-  font-family: 'Baloo 2'; font-weight: 700; font-size: 15px; border: none; border-radius: var(--radius-md);
-  padding: 13px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: transform .06s ease;
-}
-.kgm-btn:active { transform: scale(0.98); }
-.kgm-btn:disabled { opacity: .55; cursor: not-allowed; }
-.kgm-btn-primary { background: var(--primary); color: #fff; box-shadow: 0 3px 0 var(--primary-dark); }
-.kgm-btn-accent { background: var(--accent); color: #3A2705; box-shadow: 0 3px 0 var(--accent-dark); }
-.kgm-btn-ghost { background: var(--surface-2); color: var(--ink); border: 1.5px solid var(--border); }
-.kgm-btn-danger { background: var(--expense); color: #fff; box-shadow: 0 3px 0 #8f2f29; }
-.kgm-btn-sm { padding: 9px 12px; font-size: 13.5px; }
-.kgm-btn-block { width: 100%; }
-
-.kgm-gauge-wrap { display: flex; flex-direction: column; align-items: center; }
-.kgm-gauge-status {
-  font-family: 'Baloo 2'; font-weight: 800; font-size: 19px; margin-top: -8px;
-}
-.kgm-gauge-note { font-size: 12.5px; color: var(--muted); text-align: center; margin-top: 4px; line-height: 1.5; }
-
-.kgm-tabbar {
-  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
-  width: calc(100% - 24px); max-width: 460px;
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
-  display: flex; padding: 6px; box-shadow: 0 10px 24px rgba(35,48,28,0.16); z-index: 40;
-}
-.kgm-tab {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 8px 4px; border-radius: 14px; border: none; background: transparent; cursor: pointer;
-  color: var(--muted); font-family: 'Baloo 2'; font-weight: 600; font-size: 11.5px;
-}
-.kgm-tab.active { background: var(--primary-light); color: var(--primary-dark); }
-
-.kgm-toggle-row { display: flex; gap: 8px; }
-.kgm-toggle {
-  flex: 1; padding: 12px; border-radius: var(--radius-md); border: 2px solid var(--border);
-  background: var(--surface); font-family: 'Baloo 2'; font-weight: 700; font-size: 14px; cursor: pointer;
-  color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.kgm-toggle.income.active { border-color: var(--income); background: var(--income-light); color: var(--income); }
-.kgm-toggle.expense.active { border-color: var(--expense); background: var(--expense-light); color: var(--expense); }
-
-.kgm-field-label { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px; display: block; }
-.kgm-input, .kgm-select, .kgm-textarea {
-  width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 12px;
-  font-size: 15px; font-family: 'Inter'; background: var(--surface-2); color: var(--ink);
-}
-.kgm-input:focus, .kgm-select:focus, .kgm-textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; background: #fff; }
-.kgm-textarea { resize: vertical; min-height: 64px; font-family: 'Inter'; }
-.kgm-amount-input { font-family: 'JetBrains Mono'; font-weight: 700; font-size: 17px; }
-
-.kgm-chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-.kgm-chip {
-  border: 1.5px solid var(--border); background: var(--surface-2); padding: 9px 13px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink);
-}
-.kgm-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-
-.kgm-mic-wrap { display: flex; flex-direction: column; align-items: center; padding: 6px 0 4px; }
-.kgm-mic-btn {
-  width: 84px; height: 84px; border-radius: 50%; border: none; cursor: pointer;
-  background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 0 var(--primary-dark); position: relative;
-}
-.kgm-mic-btn.listening { background: var(--expense); box-shadow: 0 4px 0 #8f2f29; animation: kgm-pulse 1.2s infinite; }
-.kgm-mic-btn.processing { background: var(--accent); box-shadow: 0 4px 0 var(--accent-dark); }
-@keyframes kgm-pulse {
-  0% { box-shadow: 0 4px 0 #8f2f29, 0 0 0 0 rgba(193,68,60,0.35); }
-  70% { box-shadow: 0 4px 0 #8f2f29, 0 0 0 16px rgba(193,68,60,0); }
-  100% { box-shadow: 0 4px 0 #8f2f29, 0 0 0 0 rgba(193,68,60,0); }
-}
-.kgm-mic-status { font-family: 'Baloo 2'; font-weight: 700; font-size: 14.5px; margin-top: 12px; }
-.kgm-mic-hint { font-size: 12.5px; color: var(--muted); margin-top: 2px; text-align: center; }
-
-.kgm-divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 600; }
-.kgm-divider::before, .kgm-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-
-.kgm-draft-card { background: var(--primary-light); border: 1.5px dashed var(--primary); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.kgm-draft-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-
-.kgm-tx-item { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--border); }
-.kgm-tx-item:last-child { border-bottom: none; }
-.kgm-tx-bar { width: 5px; align-self: stretch; border-radius: 4px; flex-shrink: 0; }
-.kgm-tx-bar.income { background: var(--income); }
-.kgm-tx-bar.expense { background: var(--expense); }
-.kgm-tx-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.kgm-tx-icon.income { background: var(--income-light); color: var(--income); }
-.kgm-tx-icon.expense { background: var(--expense-light); color: var(--expense); }
-.kgm-tx-mid { flex: 1; min-width: 0; }
-.kgm-tx-cat { font-weight: 700; font-size: 14px; }
-.kgm-tx-note { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kgm-tx-date { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
-.kgm-tx-amount { font-weight: 700; font-size: 14.5px; white-space: nowrap; }
-.kgm-tx-amount.income { color: var(--income); }
-.kgm-tx-amount.expense { color: var(--expense); }
-.kgm-tx-del { background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; flex-shrink: 0; }
-
-.kgm-empty { text-align: center; padding: 36px 12px; color: var(--muted); }
-.kgm-empty-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
-
-.kgm-toast {
-  position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 60;
-  background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
-  display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-}
-
-.kgm-analysis-text { font-size: 14.5px; line-height: 1.7; color: var(--ink); white-space: pre-wrap; }
-.kgm-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-.kgm-legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-.kgm-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-.kgm-legend-amt { margin-left: auto; font-weight: 700; }
-
-.kgm-modal-backdrop { position: fixed; inset: 0; background: rgba(35,48,28,0.45); z-index: 70; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.kgm-modal { background: #fff; border-radius: var(--radius-lg); padding: 20px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 12px; }
-`;
-
-/* ---------------------------------------------------------------
-   Constants
----------------------------------------------------------------- */
-const STORAGE_KEY = "gapoktan_melon_transactions";
-
-const CATEGORIES = {
-  income: ["Penjualan Melon", "Penjualan Bibit/Lainnya", "Bantuan/Subsidi", "Pemasukan Lainnya"],
-  expense: ["Bibit & Benih", "Pupuk", "Pestisida & Obat", "Tenaga Kerja", "Listrik & Air", "Peralatan & Greenhouse", "Sewa Lahan", "Pengeluaran Lainnya"],
-};
-
-const MELON_SALE_CATEGORY = "Penjualan Melon";
-
-const MONTHS_ID = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-
-const PIE_COLORS = ["#3A6B35", "#E8A33D", "#C1443C", "#66735A", "#8AA672", "#D9A441", "#B5713F", "#5C8B6E"];
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function formatRupiah(n) {
-  const num = Number(n) || 0;
-  return "Rp " + num.toLocaleString("id-ID");
-}
-
-function formatDateID(d) {
-  try {
-    const date = new Date(d + "T00:00:00");
-    return date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
-  } catch {
-    return d;
-  }
-}
-
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-/* ---------------------------------------------------------------
-   Claude API helper (runs inside the artifact)
----------------------------------------------------------------- */
-async function callClaude(systemPrompt, userMessage) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userMessage }],
-    }),
-  });
-  if (!response.ok) throw new Error("Gagal menghubungi asisten AI (status " + response.status + ")");
-  const data = await response.json();
-  const text = (data.content || [])
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("\n");
-  return text;
-}
-
-function parseJsonLoose(text) {
-  const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
-  return JSON.parse(cleaned);
-}
-
-/* ---------------------------------------------------------------
-   PDF report — loaded on demand so the app stays light until
-   someone actually wants to share the ledger.
----------------------------------------------------------------- */
-function loadJsPDF() {
-  return new Promise((resolve, reject) => {
-    if (window.jspdf && window.jspdf.jsPDF) { resolve(window.jspdf.jsPDF); return; }
-    const existing = document.querySelector("script[data-kgm-jspdf]");
-    if (existing) {
-      existing.addEventListener("load", () => resolve(window.jspdf.jsPDF));
-      existing.addEventListener("error", () => reject(new Error("load-failed")));
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-    script.setAttribute("data-kgm-jspdf", "true");
-    script.onload = () => resolve(window.jspdf.jsPDF);
-    script.onerror = () => reject(new Error("load-failed"));
-    document.head.appendChild(script);
-  });
-}
-
-function truncateText(str, n) {
-  if (!str) return "-";
-  return str.length > n ? str.slice(0, n - 1) + "\u2026" : str;
-}
-
-function formatDateShort(d) {
-  try {
-    const date = new Date(d + "T00:00:00");
-    return date.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "2-digit" });
-  } catch {
-    return d;
-  }
-}
-
-function buildLedgerPdf(JsPDF, transactions, totals) {
-  const doc = new JsPDF({ unit: "mm", format: "a4" });
-  const marginX = 15;
-  const pageWidth = 210;
-  const pageHeight = 297;
-  let y = 20;
-
-  const melonSales = transactions.filter((t) => t.type === "income" && t.category === MELON_SALE_CATEGORY && Number(t.weightKg) > 0);
-  const totalWeight = melonSales.reduce((s, t) => s + Number(t.weightKg), 0);
-  const totalMelonAmount = melonSales.reduce((s, t) => s + Number(t.amount), 0);
-  const avgPrice = totalWeight > 0 ? totalMelonAmount / totalWeight : 0;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.setTextColor(36, 69, 31);
-  doc.text("Laporan Kas Greenhouse Melon", marginX, y);
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(110, 110, 110);
-  const printedDate = new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  doc.text("Dicetak " + printedDate, marginX, y);
-  y += 6;
-  doc.setDrawColor(215, 215, 215);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 8;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(35, 48, 28);
-  doc.text("Ringkasan Keuangan", marginX, y);
-  y += 7;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10.5);
-  const summaryLines = [
-    ["Total Pemasukan", formatRupiah(totals.totalIncome)],
-    ["Total Pengeluaran", formatRupiah(totals.totalExpense)],
-    ["Saldo Kas", formatRupiah(totals.balance)],
-  ];
-  if (totalWeight > 0) {
-    summaryLines.push(["Total Hasil Panen Melon Terjual", totalWeight.toLocaleString("id-ID") + " kg"]);
-    summaryLines.push(["Rata-rata Harga Jual", formatRupiah(Math.round(avgPrice)) + " / kg"]);
-  }
-  summaryLines.forEach(([label, value]) => {
-    doc.text(label + ":", marginX, y);
-    doc.text(value, marginX + 68, y);
-    y += 6;
-  });
-  y += 3;
-
-  doc.setDrawColor(215, 215, 215);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 8;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(35, 48, 28);
-  doc.text("Rincian Transaksi", marginX, y);
-  y += 8;
-
-  const col = { date: marginX, jenis: marginX + 20, kategori: marginX + 36, berat: marginX + 74, jumlah: marginX + 92, catatan: marginX + 120 };
-
-  function drawHeaderRow(yy) {
-    doc.setFillColor(228, 239, 222);
-    doc.rect(marginX, yy - 5, pageWidth - marginX * 2, 7, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(36, 69, 31);
-    doc.text("Tanggal", col.date, yy);
-    doc.text("Jenis", col.jenis, yy);
-    doc.text("Kategori", col.kategori, yy);
-    doc.text("Berat", col.berat, yy);
-    doc.text("Jumlah (Rp)", col.jumlah, yy);
-    doc.text("Catatan", col.catatan, yy);
-    return yy + 7;
-  }
-
-  y = drawHeaderRow(y);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(35, 48, 28);
-
-  const sorted = [...transactions].sort((a, b) => (a.date + String(a.createdAt)).localeCompare(b.date + String(b.createdAt)));
-
-  sorted.forEach((t, idx) => {
-    if (y > pageHeight - 20) {
-      doc.addPage();
-      y = 20;
-      y = drawHeaderRow(y);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(35, 48, 28);
-    }
-    if (idx % 2 === 1) {
-      doc.setFillColor(246, 248, 242);
-      doc.rect(marginX, y - 4.5, pageWidth - marginX * 2, 6.5, "F");
-    }
-    doc.text(formatDateShort(t.date), col.date, y);
-    doc.text(t.type === "income" ? "Masuk" : "Keluar", col.jenis, y);
-    doc.text(truncateText(t.category, 20), col.kategori, y);
-    doc.text(t.weightKg ? Number(t.weightKg).toLocaleString("id-ID") + " kg" : "-", col.berat, y);
-    doc.text((t.type === "expense" ? "-" : "+") + Number(t.amount).toLocaleString("id-ID"), col.jumlah, y);
-    doc.text(truncateText(t.note, 26), col.catatan, y);
-    y += 6.5;
-  });
-
-  y += 6;
-  if (y > pageHeight - 25) { doc.addPage(); y = 20; }
-  doc.setDrawColor(215, 215, 215);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 7;
-  doc.setFont("helvetica", "italic");
-  doc.setFontSize(8.5);
-  doc.setTextColor(130, 130, 130);
-  doc.text("Dibuat otomatis dari aplikasi Kas Greenhouse Melon milik gapoktan.", marginX, y);
-
-  return doc;
-}
-
-/* ---------------------------------------------------------------
-   Gauge (financial health meter) — semicircle, greenhouse-dial style
----------------------------------------------------------------- */
-function polarToCartesian(cx, cy, r, angleDeg) {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
-}
-function describeArc(cx, cy, r, startAngle, endAngle) {
-  const start = polarToCartesian(cx, cy, r, startAngle);
-  const end = polarToCartesian(cx, cy, r, endAngle);
-  const largeArcFlag = Math.abs(startAngle - endAngle) <= 180 ? 0 : 1;
-  const sweepFlag = startAngle > endAngle ? 1 : 0;
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`;
-}
-
-function HealthGauge({ totalIncome, totalExpense }) {
-  const hasData = totalIncome > 0 || totalExpense > 0;
-  const margin = totalIncome > 0 ? (totalIncome - totalExpense) / totalIncome : totalExpense > 0 ? -1 : 0;
-  const clamped = Math.max(-0.5, Math.min(0.5, margin));
-  const value = (clamped + 0.5) / 1; // 0..1
-  const needleAngle = 180 - value * 180;
-  const cx = 120, cy = 118, r = 96;
-  const tip = polarToCartesian(cx, cy, r - 18, needleAngle);
-
-  let status = "Belum Ada Data", statusColor = "var(--muted)", note = "Mulai catat transaksi untuk melihat kondisi keuangan gapoktan.";
-  if (hasData) {
-    if (margin >= 0.2) { status = "Sehat"; statusColor = "var(--income)"; note = "Pemasukan jauh lebih besar dari pengeluaran. Kondisi kas gapoktan dalam keadaan baik."; }
-    else if (margin >= 0) { status = "Waspada"; statusColor = "var(--warn)"; note = "Pemasukan dan pengeluaran hampir seimbang. Perlu dijaga agar tidak minus."; }
-    else { status = "Perlu Perhatian"; statusColor = "var(--expense)"; note = "Pengeluaran lebih besar dari pemasukan. Segera tinjau pos pengeluaran terbesar."; }
-  }
-
-  return (
-    <div className="kgm-gauge-wrap">
-      <svg viewBox="0 0 240 140" width="220" height="128">
-        <path d={describeArc(cx, cy, r, 180, 120)} stroke="var(--expense)" strokeWidth="20" fill="none" strokeLinecap="round" />
-        <path d={describeArc(cx, cy, r, 120, 60)} stroke="var(--warn)" strokeWidth="20" fill="none" strokeLinecap="round" />
-        <path d={describeArc(cx, cy, r, 60, 0)} stroke="var(--income)" strokeWidth="20" fill="none" strokeLinecap="round" />
-        {hasData && (
-          <g>
-            <line x1={cx} y1={cy} x2={tip.x} y2={tip.y} stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" />
-            <circle cx={cx} cy={cy} r="8" fill="var(--ink)" />
-          </g>
-        )}
-      </svg>
-      <div className="kgm-gauge-status" style={{ color: statusColor }}>{status}</div>
-      <div className="kgm-gauge-note">{note}</div>
-    </div>
-  );
-}
-
-/* ---------------------------------------------------------------
-   Main App
----------------------------------------------------------------- */
-export default function App() {
-  const [activeTab, setActiveTab] = useState("beranda");
-  const [transactions, setTransactions] = useState([]);
-  const [loaded, setLoaded] = useState(false);
-  const [toast, setToast] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [confirmClear, setConfirmClear] = useState(false);
-  const [isSharingPdf, setIsSharingPdf] = useState(false);
-  const toastTimer = useRef(null);
-
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2200);
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await window.storage.get(STORAGE_KEY, true);
-        if (res && res.value) setTransactions(JSON.parse(res.value));
-      } catch (e) {
-        setTransactions([]);
-      } finally {
-        setLoaded(true);
-      }
-    })();
-  }, []);
-
-  const persist = useCallback(async (next) => {
-    setTransactions(next);
-    try {
-      await window.storage.set(STORAGE_KEY, JSON.stringify(next), true);
-    } catch (e) {
-      showToast("Gagal menyimpan, coba lagi");
-    }
-  }, [showToast]);
-
-  const addTransaction = useCallback(async (tx) => {
-    const next = [...transactions, { ...tx, id: uid(), createdAt: Date.now() }];
-    await persist(next);
-    showToast("Transaksi tersimpan");
-  }, [transactions, persist, showToast]);
-
-  const deleteTransaction = useCallback(async (id) => {
-    const next = transactions.filter((t) => t.id !== id);
-    await persist(next);
-    showToast("Transaksi dihapus");
-  }, [transactions, persist, showToast]);
-
-  const clearAll = useCallback(async () => {
-    await persist([]);
-    setConfirmClear(false);
-    setMenuOpen(false);
-    showToast("Semua data dihapus");
-  }, [persist, showToast]);
-
-  const totalIncome = transactions.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-  const totalExpense = transactions.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
-  const balance = totalIncome - totalExpense;
-
-  async function handleSharePdf() {
-    if (transactions.length === 0) { showToast("Belum ada transaksi untuk dibagikan"); return; }
-    setIsSharingPdf(true);
-    try {
-      const JsPDFCtor = await loadJsPDF();
-      const doc = buildLedgerPdf(JsPDFCtor, transactions, { totalIncome, totalExpense, balance });
-      const blob = doc.output("blob");
-      const file = new File([blob], "laporan-kas-gapoktan-melon.pdf", { type: "application/pdf" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: "Laporan Kas Greenhouse Melon", text: "Laporan kas gapoktan greenhouse melon" });
-          showToast("Laporan dibagikan");
-        } catch (shareErr) {
-          if (shareErr && shareErr.name !== "AbortError") {
-            doc.save("laporan-kas-gapoktan-melon.pdf");
-            showToast("PDF diunduh");
-          }
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akarkas - Keuangan Greenhouse Melon</title>
+    <!-- Library html2pdf untuk fitur cetak/bagikan PDF langsung dari browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #27ae60;
+            --danger: #e74c3c;
+            --bg: #faf8f5;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
         }
-      } else {
-        doc.save("laporan-kas-gapoktan-melon.pdf");
-        showToast("PDF diunduh");
-      }
-    } catch (e) {
-      showToast("Gagal membuat PDF, periksa koneksi internet");
-    } finally {
-      setIsSharingPdf(false);
-    }
-  }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        /* Dashboard Analisis Keuangan */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        .card h3 { margin: 0; font-size: 14px; color: #7f8c8d; }
+        .card h2 { margin: 10px 0 0 0; font-size: 24px; }
+        .saldo-text { color: var(--text); }
+        .in-text { color: var(--primary); }
+        .out-text { color: var(--danger); }
+        
+        /* Form Input */
+        .input-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        input, select, button {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        input { flex: 1; min-width: 150px; }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+        .btn-primary:hover { background-color: #219653; }
+        
+        /* Voice Chat Bot & Ekspor */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn-voice {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            flex: 1;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-pdf {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            flex: 1;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-  return (
-    <div className="kgm-root">
-      <style>{STYLES}</style>
-      <div className="kgm-app">
-        <header className="kgm-header">
-          <div className="kgm-brand">
-            <div className="kgm-brand-icon"><Sprout size={22} /></div>
-            <div>
-              <div className="kgm-brand-title">Kas Greenhouse Melon</div>
-              <div className="kgm-brand-sub">Buku kas digital gapoktan</div>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button className="kgm-icon-btn" onClick={handleSharePdf} disabled={isSharingPdf} aria-label="Bagikan laporan PDF">
-              {isSharingPdf ? <Loader2 size={17} style={{ animation: "kgm-spin 1s linear infinite" }} /> : <Share2 size={17} />}
-            </button>
-            <div style={{ position: "relative" }}>
-              <button className="kgm-icon-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Menu">
-                <MoreVertical size={18} />
-              </button>
-              {menuOpen && (
-                <div style={{ position: "absolute", right: 0, top: 46, background: "#fff", border: "1.5px solid var(--border)", borderRadius: 14, padding: 8, width: 220, boxShadow: "0 8px 20px rgba(35,48,28,0.15)", zIndex: 50 }}>
-                  <div style={{ fontSize: 12, color: "var(--muted)", padding: "6px 8px", lineHeight: 1.5 }}>
-                    Data dibagikan ke semua anggota gapoktan yang membuka aplikasi ini, seperti buku kas bersama.
-                  </div>
-                  <button className="kgm-btn kgm-btn-danger kgm-btn-sm kgm-btn-block" onClick={() => setConfirmClear(true)}>
-                    <Trash2 size={15} /> Hapus Semua Data
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
+        /* Tabel Data */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th { background-color: #f1f8f4; color: var(--primary); }
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-edit { background-color: #f1c40f; color: #fff; }
+        .btn-delete { background-color: var(--danger); color: #fff; }
+        
+        @media (max-width: 600px) {
+            th, td { padding: 10px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
 
-        {toast && <div className="kgm-toast"><Check size={15} /> {toast}</div>}
-
-        {!loaded ? (
-          <div className="kgm-card" style={{ textAlign: "center", padding: 40 }}>
-            <Loader2 size={26} className="kgm-spin" style={{ animation: "kgm-spin 1s linear infinite" }} />
-            <style>{`@keyframes kgm-spin { to { transform: rotate(360deg); } }`}</style>
-            <div style={{ marginTop: 10, color: "var(--muted)", fontSize: 13.5 }}>Memuat data kas...</div>
-          </div>
-        ) : (
-          <>
-            {activeTab === "beranda" && (
-              <BerandaTab
-                transactions={transactions}
-                totalIncome={totalIncome}
-                totalExpense={totalExpense}
-                balance={balance}
-                goToCatat={() => setActiveTab("catat")}
-              />
-            )}
-            {activeTab === "catat" && (
-              <CatatTab addTransaction={addTransaction} showToast={showToast} />
-            )}
-            {activeTab === "riwayat" && (
-              <RiwayatTab transactions={transactions} deleteTransaction={deleteTransaction} onSharePdf={handleSharePdf} isSharingPdf={isSharingPdf} />
-            )}
-            {activeTab === "analisis" && (
-              <AnalisisTab
-                transactions={transactions}
-                totalIncome={totalIncome}
-                totalExpense={totalExpense}
-              />
-            )}
-          </>
-        )}
-      </div>
-
-      <nav className="kgm-tabbar">
-        <TabBtn icon={Home} label="Beranda" active={activeTab === "beranda"} onClick={() => setActiveTab("beranda")} />
-        <TabBtn icon={ClipboardList} label="Catat" active={activeTab === "catat"} onClick={() => setActiveTab("catat")} />
-        <TabBtn icon={History} label="Riwayat" active={activeTab === "riwayat"} onClick={() => setActiveTab("riwayat")} />
-        <TabBtn icon={TrendingUp} label="Analisis" active={activeTab === "analisis"} onClick={() => setActiveTab("analisis")} />
-      </nav>
-
-      {confirmClear && (
-        <div className="kgm-modal-backdrop" onClick={() => setConfirmClear(false)}>
-          <div className="kgm-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="kgm-card-title" style={{ margin: 0 }}><AlertTriangle size={18} color="var(--expense)" /> Hapus Semua Data?</div>
-            <div style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.6 }}>
-              Semua catatan transaksi akan dihapus secara permanen untuk seluruh anggota gapoktan. Tindakan ini tidak bisa dibatalkan.
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button className="kgm-btn kgm-btn-ghost kgm-btn-block" onClick={() => setConfirmClear(false)}>Batal</button>
-              <button className="kgm-btn kgm-btn-danger kgm-btn-block" onClick={clearAll}>Ya, Hapus</button>
-            </div>
-          </div>
-        </div>
-      )}
+<div class="container" id="app-container">
+    <div class="header">
+        <h1>Akarkas Greenhouse</h1>
+        <p>Pencatatan Keuangan Gapoktan Melon</p>
     </div>
-  );
-}
 
-function TabBtn({ icon: Icon, label, active, onClick }) {
-  return (
-    <button className={"kgm-tab" + (active ? " active" : "")} onClick={onClick}>
-      <Icon size={20} />
-      {label}
-    </button>
-  );
-}
-
-/* ---------------------------------------------------------------
-   Beranda (Dashboard)
----------------------------------------------------------------- */
-function BerandaTab({ transactions, totalIncome, totalExpense, balance, goToCatat }) {
-  const monthlyData = buildMonthlyData(transactions, 6);
-  const melonSales = transactions.filter((t) => t.type === "income" && t.category === MELON_SALE_CATEGORY && Number(t.weightKg) > 0);
-  const totalHarvestKg = melonSales.reduce((s, t) => s + Number(t.weightKg), 0);
-  const totalHarvestAmount = melonSales.reduce((s, t) => s + Number(t.amount), 0);
-  const avgPricePerKg = totalHarvestKg > 0 ? totalHarvestAmount / totalHarvestKg : 0;
-
-  return (
-    <>
-      <div className="kgm-card">
-        <div className="kgm-balance-label">Saldo Kas Gapoktan</div>
-        <div className={"kgm-balance-amount kgm-mono"} style={{ color: balance < 0 ? "var(--expense)" : "var(--ink)" }}>
-          {formatRupiah(balance)}
+    <div class="dashboard">
+        <div class="card">
+            <h3>Total Pemasukan</h3>
+            <h2 class="in-text" id="tot-in">Rp 0</h2>
         </div>
-        <div className="kgm-stat-row" style={{ marginTop: 14 }}>
-          <div className="kgm-stat income">
-            <div className="kgm-stat-top"><ArrowUpRight size={15} /> Pemasukan</div>
-            <div className="kgm-stat-amount kgm-mono">{formatRupiah(totalIncome)}</div>
-          </div>
-          <div className="kgm-stat expense">
-            <div className="kgm-stat-top"><ArrowDownRight size={15} /> Pengeluaran</div>
-            <div className="kgm-stat-amount kgm-mono">{formatRupiah(totalExpense)}</div>
-          </div>
+        <div class="card">
+            <h3>Total Pengeluaran</h3>
+            <h2 class="out-text" id="tot-out">Rp 0</h2>
         </div>
-      </div>
-
-      <div className="kgm-card">
-        <div className="kgm-card-title"><Sprout size={16} /> Kondisi Keuangan Gapoktan</div>
-        <HealthGauge totalIncome={totalIncome} totalExpense={totalExpense} />
-      </div>
-
-      {totalHarvestKg > 0 && (
-        <div className="kgm-card">
-          <div className="kgm-card-title"><Scale size={16} /> Hasil Panen Melon Terjual</div>
-          <div className="kgm-stat-row">
-            <div className="kgm-stat" style={{ background: "var(--warn-light)" }}>
-              <div className="kgm-stat-top" style={{ color: "var(--accent-dark)" }}><Scale size={15} /> Total Berat</div>
-              <div className="kgm-stat-amount kgm-mono">{totalHarvestKg.toLocaleString("id-ID")} kg</div>
-            </div>
-            <div className="kgm-stat" style={{ background: "var(--primary-light)" }}>
-              <div className="kgm-stat-top" style={{ color: "var(--primary-dark)" }}><TrendingUp size={15} /> Harga Rata-rata</div>
-              <div className="kgm-stat-amount kgm-mono">{formatRupiah(Math.round(avgPricePerKg))}/kg</div>
-            </div>
-          </div>
+        <div class="card">
+            <h3>Saldo Gapoktan</h3>
+            <h2 class="saldo-text" id="tot-saldo">Rp 0</h2>
         </div>
-      )}
-
-      {transactions.length > 0 && (
-        <div className="kgm-card">
-          <div className="kgm-card-title"><TrendingUp size={16} /> Tren 6 Bulan Terakhir</div>
-          <ResponsiveContainer width="100%" height={190}>
-            <BarChart data={monthlyData} barGap={4}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} width={38} tickFormatter={(v) => (v >= 1000000 ? (v / 1000000) + "jt" : v)} />
-              <Tooltip formatter={(v) => formatRupiah(v)} contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12.5 }} />
-              <Bar dataKey="income" name="Pemasukan" fill="var(--income)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expense" name="Pengeluaran" fill="var(--expense)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <div class="card">
+            <h3>Total Panen Melon</h3>
+            <h2 class="in-text" id="tot-melon">0 Kg</h2>
         </div>
-      )}
-
-      <button className="kgm-btn kgm-btn-primary kgm-btn-block" onClick={goToCatat}>
-        <Plus size={18} /> Catat Transaksi Baru
-      </button>
-    </>
-  );
-}
-
-function buildMonthlyData(transactions, count) {
-  const now = new Date();
-  const buckets = [];
-  for (let i = count - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: MONTHS_ID[d.getMonth()], income: 0, expense: 0 });
-  }
-  const map = Object.fromEntries(buckets.map((b) => [b.key, b]));
-  transactions.forEach((t) => {
-    const d = new Date(t.date + "T00:00:00");
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
-    if (map[key]) {
-      if (t.type === "income") map[key].income += Number(t.amount);
-      else map[key].expense += Number(t.amount);
-    }
-  });
-  return buckets;
-}
-
-/* ---------------------------------------------------------------
-   Catat Tab — voice + manual entry
----------------------------------------------------------------- */
-function CatatTab({ addTransaction, showToast }) {
-  const [isListening, setIsListening] = useState(false);
-  const [isParsing, setIsParsing] = useState(false);
-  const [voiceSupported, setVoiceSupported] = useState(true);
-  const [manualVoiceText, setManualVoiceText] = useState("");
-  const [voiceError, setVoiceError] = useState("");
-  const [draft, setDraft] = useState(null);
-  const recognitionRef = useRef(null);
-
-  const [form, setForm] = useState({ type: "expense", category: CATEGORIES.expense[0], amount: "", date: todayStr(), note: "", weightKg: "" });
-
-  useEffect(() => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) setVoiceSupported(false);
-  }, []);
-
-  async function processVoiceNote(text) {
-    if (!text || !text.trim()) return;
-    setIsParsing(true);
-    setVoiceError("");
-    try {
-      const allCats = [...CATEGORIES.income, ...CATEGORIES.expense].join(", ");
-      const system = `Kamu adalah asisten pencatatan keuangan untuk usaha greenhouse melon milik kelompok tani (gapoktan). Ubah catatan suara/teks petani menjadi data transaksi terstruktur.
-
-Kategori Pemasukan valid: ${CATEGORIES.income.join(", ")}
-Kategori Pengeluaran valid: ${CATEGORIES.expense.join(", ")}
-
-Balas HANYA dengan JSON murni (tanpa markdown, tanpa penjelasan) dengan format persis:
-{"type":"income" atau "expense","category":"salah satu kategori valid di atas","amount":angka_rupiah_tanpa_titik,"weight_kg":angka_kilogram_atau_null,"date":"YYYY-MM-DD","description":"ringkasan singkat"}
-
-Aturan khusus "amount": jika yang disebutkan adalah berat dan harga per kilogram (misal "300 kilo harga 15 ribu per kilo"), hitung amount = berat x harga per kg. Jika total nilai sudah disebutkan langsung, pakai itu.
-Aturan khusus "weight_kg": isi hanya jika kategori adalah "Penjualan Melon" dan berat disebutkan, selain itu isi null.
-Jika tanggal tidak disebutkan, gunakan ${todayStr()}. Jika teks tidak berkaitan dengan transaksi keuangan, balas {"error":"tidak_dikenali"}.`;
-      const raw = await callClaude(system, text);
-      const parsed = parseJsonLoose(raw);
-      if (parsed.error) {
-        setVoiceError("Tidak dapat memahami catatan. Coba ucapkan ulang, misalnya: \"Beli pupuk 500 ribu\" atau \"Jual melon 300 kilo 15 ribu per kilo\".");
-        setIsParsing(false);
-        return;
-      }
-      const type = parsed.type === "income" ? "income" : "expense";
-      const validCats = CATEGORIES[type];
-      const category = validCats.includes(parsed.category) ? parsed.category : validCats[validCats.length - 1];
-      setDraft({
-        type,
-        category,
-        amount: String(Math.round(Number(parsed.amount) || 0)),
-        weightKg: type === "income" && category === MELON_SALE_CATEGORY && parsed.weight_kg ? String(Math.round(Number(parsed.weight_kg))) : "",
-        date: /^\d{4}-\d{2}-\d{2}$/.test(parsed.date) ? parsed.date : todayStr(),
-        note: parsed.description || text,
-      });
-    } catch (e) {
-      setVoiceError("Gagal memproses suara. Periksa koneksi internet lalu coba lagi.");
-    } finally {
-      setIsParsing(false);
-    }
-  }
-
-  function startVoice() {
-    setVoiceError("");
-    setDraft(null);
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { setVoiceSupported(false); return; }
-    const recognition = new SR();
-    recognitionRef.current = recognition;
-    recognition.lang = "id-ID";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onstart = () => setIsListening(true);
-    recognition.onerror = () => { setIsListening(false); setVoiceError("Tidak bisa mengakses mikrofon. Pastikan izin mikrofon diaktifkan."); };
-    recognition.onend = () => setIsListening(false);
-    recognition.onresult = (e) => {
-      const text = e.results[0][0].transcript;
-      processVoiceNote(text);
-    };
-    try { recognition.start(); } catch (e) { setIsListening(false); }
-  }
-
-  async function saveDraft() {
-    if (!draft || !Number(draft.amount)) { showToast("Jumlah tidak boleh kosong"); return; }
-    await addTransaction({ ...draft, amount: Number(draft.amount), weightKg: draft.weightKg ? Number(draft.weightKg) : null });
-    setDraft(null);
-  }
-
-  async function submitManual(e) {
-    e.preventDefault();
-    if (!Number(form.amount)) { showToast("Isi jumlah terlebih dahulu"); return; }
-    await addTransaction({ ...form, amount: Number(form.amount), weightKg: form.weightKg ? Number(form.weightKg) : null });
-    setForm({ type: form.type, category: CATEGORIES[form.type][0], amount: "", date: todayStr(), note: "", weightKg: "" });
-  }
-
-  return (
-    <>
-      <div className="kgm-card">
-        <div className="kgm-card-title"><Volume2 size={16} /> Catat dengan Suara</div>
-        <div className="kgm-mic-wrap">
-          <button
-            className={"kgm-mic-btn" + (isListening ? " listening" : "") + (isParsing ? " processing" : "")}
-            onClick={startVoice}
-            disabled={isParsing}
-            aria-label="Rekam catatan suara"
-          >
-            {isParsing ? <Loader2 size={30} style={{ animation: "kgm-spin 1s linear infinite" }} /> : <Mic size={30} />}
-          </button>
-          <style>{`@keyframes kgm-spin { to { transform: rotate(360deg); } }`}</style>
-          <div className="kgm-mic-status">
-            {isParsing ? "Memproses catatan..." : isListening ? "Mendengarkan, silakan bicara..." : "Ketuk untuk mulai bicara"}
-          </div>
-          <div className="kgm-mic-hint">Contoh: "Beli pupuk NPK 500 ribu" atau "Jual melon 300 kilo harga 15 ribu per kilo"</div>
-        </div>
-
-        {!voiceSupported && (
-          <div style={{ marginTop: 12 }}>
-            <div className="kgm-field-label">Perangkat ini tidak mendukung input suara. Ketik catatan, lalu proses dengan AI:</div>
-            <textarea className="kgm-textarea" placeholder="Contoh: beli pupuk 500 ribu" value={manualVoiceText} onChange={(e) => setManualVoiceText(e.target.value)} />
-            <button className="kgm-btn kgm-btn-accent kgm-btn-block" style={{ marginTop: 8 }} onClick={() => processVoiceNote(manualVoiceText)} disabled={isParsing}>
-              <Sparkles size={16} /> Proses dengan AI
-            </button>
-          </div>
-        )}
-
-        {voiceError && (
-          <div style={{ marginTop: 12, background: "var(--expense-light)", color: "var(--expense)", padding: 10, borderRadius: 10, fontSize: 13, lineHeight: 1.5 }}>
-            {voiceError}
-          </div>
-        )}
-
-        {draft && (
-          <div className="kgm-draft-card" style={{ marginTop: 12 }}>
-            <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--primary-dark)" }}>Konfirmasi sebelum simpan:</div>
-            <div className="kgm-toggle-row">
-              <button type="button" className={"kgm-toggle income" + (draft.type === "income" ? " active" : "")} onClick={() => setDraft({ ...draft, type: "income", category: CATEGORIES.income[0] })}>
-                <ArrowUpRight size={15} /> Pemasukan
-              </button>
-              <button type="button" className={"kgm-toggle expense" + (draft.type === "expense" ? " active" : "")} onClick={() => setDraft({ ...draft, type: "expense", category: CATEGORIES.expense[0] })}>
-                <ArrowDownRight size={15} /> Pengeluaran
-              </button>
-            </div>
-            <div>
-              <label className="kgm-field-label">Kategori</label>
-              <select className="kgm-select" value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })}>
-                {CATEGORIES[draft.type].map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="kgm-field-label">Jumlah (Rp)</label>
-              <input className="kgm-input kgm-amount-input" type="number" value={draft.amount} onChange={(e) => setDraft({ ...draft, amount: e.target.value })} />
-            </div>
-            {draft.type === "income" && draft.category === MELON_SALE_CATEGORY && (
-              <div>
-                <label className="kgm-field-label">Berat Melon Terjual (kg)</label>
-                <input className="kgm-input kgm-amount-input" type="number" inputMode="decimal" placeholder="0" value={draft.weightKg} onChange={(e) => setDraft({ ...draft, weightKg: e.target.value })} />
-              </div>
-            )}
-            <div>
-              <label className="kgm-field-label">Tanggal</label>
-              <input className="kgm-input" type="date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} />
-            </div>
-            <div>
-              <label className="kgm-field-label">Catatan</label>
-              <input className="kgm-input" type="text" value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value })} />
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button className="kgm-btn kgm-btn-ghost kgm-btn-block" onClick={() => setDraft(null)}><X size={16} /> Batal</button>
-              <button className="kgm-btn kgm-btn-primary kgm-btn-block" onClick={saveDraft}><Check size={16} /> Simpan</button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="kgm-divider">atau isi manual</div>
-
-      <form className="kgm-card" onSubmit={submitManual} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="kgm-toggle-row">
-          <button type="button" className={"kgm-toggle income" + (form.type === "income" ? " active" : "")} onClick={() => setForm({ ...form, type: "income", category: CATEGORIES.income[0] })}>
-            <ArrowUpRight size={15} /> Pemasukan
-          </button>
-          <button type="button" className={"kgm-toggle expense" + (form.type === "expense" ? " active" : "")} onClick={() => setForm({ ...form, type: "expense", category: CATEGORIES.expense[0] })}>
-            <ArrowDownRight size={15} /> Pengeluaran
-          </button>
-        </div>
-
-        <div>
-          <label className="kgm-field-label">Kategori</label>
-          <div className="kgm-chip-wrap">
-            {CATEGORIES[form.type].map((c) => (
-              <button type="button" key={c} className={"kgm-chip" + (form.category === c ? " active" : "")} onClick={() => setForm({ ...form, category: c, weightKg: c === MELON_SALE_CATEGORY ? form.weightKg : "" })}>
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="kgm-field-label">Jumlah (Rp)</label>
-          <input className="kgm-input kgm-amount-input" type="number" inputMode="numeric" placeholder="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
-        </div>
-
-        {form.type === "income" && form.category === MELON_SALE_CATEGORY && (
-          <div>
-            <label className="kgm-field-label">Berat Melon Terjual (kg)</label>
-            <input className="kgm-input kgm-amount-input" type="number" inputMode="decimal" placeholder="0" value={form.weightKg} onChange={(e) => setForm({ ...form, weightKg: e.target.value })} />
-          </div>
-        )}
-
-        <div>
-          <label className="kgm-field-label">Tanggal</label>
-          <input className="kgm-input" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-        </div>
-
-        <div>
-          <label className="kgm-field-label">Catatan (opsional)</label>
-          <textarea className="kgm-textarea" placeholder="Contoh: panen minggu ke-3" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
-        </div>
-
-        <button type="submit" className="kgm-btn kgm-btn-primary kgm-btn-block"><Plus size={18} /> Simpan Transaksi</button>
-      </form>
-    </>
-  );
-}
-
-/* ---------------------------------------------------------------
-   Riwayat Tab
----------------------------------------------------------------- */
-function RiwayatTab({ transactions, deleteTransaction, onSharePdf, isSharingPdf }) {
-  const [filter, setFilter] = useState("all");
-  const [confirmId, setConfirmId] = useState(null);
-
-  const filtered = transactions
-    .filter((t) => filter === "all" || t.type === filter)
-    .sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
-
-  return (
-    <div className="kgm-card">
-      <div className="kgm-card-title"><History size={16} /> Riwayat Transaksi</div>
-      <button className="kgm-btn kgm-btn-accent kgm-btn-block" onClick={onSharePdf} disabled={isSharingPdf || transactions.length === 0} style={{ marginBottom: 14 }}>
-        {isSharingPdf ? <Loader2 size={16} style={{ animation: "kgm-spin 1s linear infinite" }} /> : <Share2 size={16} />}
-        {isSharingPdf ? "Menyiapkan PDF..." : "Bagikan Laporan PDF"}
-      </button>
-      <div className="kgm-chip-wrap" style={{ marginBottom: 8 }}>
-        <button className={"kgm-chip" + (filter === "all" ? " active" : "")} onClick={() => setFilter("all")}>Semua</button>
-        <button className={"kgm-chip" + (filter === "income" ? " active" : "")} onClick={() => setFilter("income")}>Pemasukan</button>
-        <button className={"kgm-chip" + (filter === "expense" ? " active" : "")} onClick={() => setFilter("expense")}>Pengeluaran</button>
-      </div>
-
-      {filtered.length === 0 ? (
-        <div className="kgm-empty">
-          <div className="kgm-empty-icon"><ClipboardList size={24} /></div>
-          <div style={{ fontWeight: 700, fontFamily: "'Baloo 2'" }}>Belum ada catatan</div>
-          <div style={{ fontSize: 13, marginTop: 4 }}>Ketuk tab "Catat" untuk menambah transaksi pertama.</div>
-        </div>
-      ) : (
-        <div>
-          {filtered.map((t) => (
-            <div className="kgm-tx-item" key={t.id}>
-              <div className={"kgm-tx-bar " + t.type} />
-              <div className={"kgm-tx-icon " + t.type}>
-                {t.type === "income" ? <ArrowUpRight size={17} /> : <ArrowDownRight size={17} />}
-              </div>
-              <div className="kgm-tx-mid">
-                <div className="kgm-tx-cat">{t.category}</div>
-                {t.note && <div className="kgm-tx-note">{t.note}</div>}
-                {Number(t.weightKg) > 0 && (
-                  <div className="kgm-tx-note">
-                    {Number(t.weightKg).toLocaleString("id-ID")} kg
-                    {" \u2022 "}{formatRupiah(Math.round(t.amount / t.weightKg))}/kg
-                  </div>
-                )}
-                <div className="kgm-tx-date">{formatDateID(t.date)}</div>
-              </div>
-              {confirmId === t.id ? (
-                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                  <button className="kgm-btn kgm-btn-ghost kgm-btn-sm" onClick={() => setConfirmId(null)}>Batal</button>
-                  <button className="kgm-btn kgm-btn-danger kgm-btn-sm" onClick={() => { deleteTransaction(t.id); setConfirmId(null); }}>Hapus</button>
-                </div>
-              ) : (
-                <>
-                  <div className={"kgm-tx-amount kgm-mono " + t.type}>{t.type === "expense" ? "-" : "+"}{formatRupiah(t.amount)}</div>
-                  <button className="kgm-tx-del" onClick={() => setConfirmId(t.id)} aria-label="Hapus transaksi">
-                    <Trash2 size={16} />
-                  </button>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
-  );
-}
 
-/* ---------------------------------------------------------------
-   Analisis Tab
----------------------------------------------------------------- */
-function AnalisisTab({ transactions, totalIncome, totalExpense }) {
-  const [analysis, setAnalysis] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisError, setAnalysisError] = useState("");
+    <div class="action-buttons data-ignore-print">
+        <button class="btn-voice" onclick="startVoiceBot()">🎤 Catat dengan Suara (Chat Bot)</button>
+        <button class="btn-pdf" onclick="exportPDF()">📄 Bagikan Laporan PDF</button>
+    </div>
+    <p id="voice-status" style="color: #f39c12; font-size: 14px; text-align: center; display: none;">Mendengarkan... Sebutkan: "Pemasukan hasil panen melon 200 kilo 4 juta rupiah"</p>
 
-  const expenseByCategory = {};
-  transactions.filter((t) => t.type === "expense").forEach((t) => {
-    expenseByCategory[t.category] = (expenseByCategory[t.category] || 0) + Number(t.amount);
-  });
-  const pieData = Object.entries(expenseByCategory).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    <div class="input-section data-ignore-print">
+        <div class="form-group">
+            <select id="jenis">
+                <option value="pemasukan">Pemasukan (Panen)</option>
+                <option value="pengeluaran">Pengeluaran</option>
+            </select>
+            <input type="text" id="keterangan" placeholder="Keterangan (misal: Hasil Panen 1)">
+        </div>
+        <div class="form-group">
+            <input type="number" id="nominal" placeholder="Nominal Rp (misal: 1000000)">
+            <input type="number" id="berat" placeholder="Berat Melon (Kg) *opsional">
+        </div>
+        <input type="hidden" id="edit-id" value="">
+        <button class="btn-primary" onclick="simpanData()">Simpan Catatan</button>
+    </div>
 
-  const monthlyData = buildMonthlyData(transactions, 6);
+    <table>
+        <thead>
+            <tr>
+                <th>Keterangan</th>
+                <th>Jenis</th>
+                <th>Berat (Kg)</th>
+                <th>Nominal</th>
+                <th class="data-ignore-print">Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tabel-body">
+            <!-- Data akan masuk ke sini -->
+        </tbody>
+    </table>
+</div>
 
-  const melonSales = transactions.filter((t) => t.type === "income" && t.category === MELON_SALE_CATEGORY && Number(t.weightKg) > 0);
-  const totalHarvestKg = melonSales.reduce((s, t) => s + Number(t.weightKg), 0);
-  const totalHarvestAmount = melonSales.reduce((s, t) => s + Number(t.amount), 0);
-  const avgPricePerKg = totalHarvestKg > 0 ? totalHarvestAmount / totalHarvestKg : 0;
+<script>
+    let transaksi = [];
 
-  async function runAnalysis() {
-    setIsAnalyzing(true);
-    setAnalysisError("");
-    try {
-      const summary = {
-        total_pemasukan: totalIncome,
-        total_pengeluaran: totalExpense,
-        saldo: totalIncome - totalExpense,
-        jumlah_transaksi: transactions.length,
-        pengeluaran_per_kategori: expenseByCategory,
-        tren_6_bulan: monthlyData.map((m) => ({ bulan: m.label, pemasukan: m.income, pengeluaran: m.expense })),
-        hasil_panen_melon_kg: totalHarvestKg,
-        harga_rata_rata_jual_per_kg: Math.round(avgPricePerKg),
-      };
-      const system = `Kamu adalah penasihat keuangan sederhana untuk kelompok tani (gapoktan) pengelola usaha greenhouse melon. Berdasarkan ringkasan data keuangan yang diberikan, tulis analisis singkat (maksimal 4 paragraf pendek) dalam Bahasa Indonesia yang mudah dipahami semua kalangan termasuk petani senior. Jelaskan kondisi kesehatan keuangan usaha, sorot pos pengeluaran terbesar, dan beri 2-3 saran praktis yang bisa langsung diterapkan. Gunakan bahasa hangat dan jelas, hindari istilah keuangan rumit. Jangan pakai format markdown (bintang, tanda pagar), cukup paragraf teks biasa.`;
-      const result = await callClaude(system, JSON.stringify(summary));
-      setAnalysis(result.trim());
-    } catch (e) {
-      setAnalysisError("Gagal membuat analisis. Periksa koneksi internet lalu coba lagi.");
-    } finally {
-      setIsAnalyzing(false);
+    // Format Rupiah
+    const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
+    function simpanData() {
+        const jenis = document.getElementById('jenis').value;
+        const keterangan = document.getElementById('keterangan').value;
+        const nominal = parseInt(document.getElementById('nominal').value) || 0;
+        const berat = parseInt(document.getElementById('berat').value) || 0;
+        const editId = document.getElementById('edit-id').value;
+
+        if(!keterangan || nominal <= 0) return alert('Keterangan dan Nominal harus diisi dengan benar!');
+
+        if (editId) {
+            // Proses Edit
+            const index = transaksi.findIndex(t => t.id == editId);
+            transaksi[index] = { id: editId, jenis, keterangan, nominal, berat };
+            document.getElementById('edit-id').value = '';
+        } else {
+            // Proses Tambah Baru
+            transaksi.push({ id: Date.now(), jenis, keterangan, nominal, berat });
+        }
+
+        // Kosongkan form
+        document.getElementById('keterangan').value = '';
+        document.getElementById('nominal').value = '';
+        document.getElementById('berat').value = '';
+        
+        renderTabel();
     }
-  }
 
-  if (transactions.length === 0) {
-    return (
-      <div className="kgm-card">
-        <div className="kgm-empty">
-          <div className="kgm-empty-icon"><TrendingUp size={24} /></div>
-          <div style={{ fontWeight: 700, fontFamily: "'Baloo 2'" }}>Belum ada data untuk dianalisis</div>
-          <div style={{ fontSize: 13, marginTop: 4 }}>Catat beberapa transaksi terlebih dahulu di tab "Catat".</div>
-        </div>
-      </div>
-    );
-  }
+    function hapusData(id) {
+        if(confirm("Apakah yakin ingin menghapus catatan ini?")) {
+            transaksi = transaksi.filter(t => t.id !== id);
+            renderTabel();
+        }
+    }
 
-  return (
-    <>
-      {pieData.length > 0 && (
-        <div className="kgm-card">
-          <div className="kgm-card-title"><ArrowDownRight size={16} /> Pengeluaran per Kategori</div>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                {pieData.map((entry, i) => <Cell key={entry.name} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-              </Pie>
-              <Tooltip formatter={(v) => formatRupiah(v)} contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12.5 }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="kgm-legend">
-            {pieData.map((entry, i) => (
-              <div className="kgm-legend-row" key={entry.name}>
-                <span className="kgm-legend-dot" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                {entry.name}
-                <span className="kgm-legend-amt kgm-mono">{formatRupiah(entry.value)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    function editData(id) {
+        const data = transaksi.find(t => t.id === id);
+        document.getElementById('jenis').value = data.jenis;
+        document.getElementById('keterangan').value = data.keterangan;
+        document.getElementById('nominal').value = data.nominal;
+        document.getElementById('berat').value = data.berat;
+        document.getElementById('edit-id').value = data.id;
+        window.scrollTo(0, 0);
+    }
 
-      <div className="kgm-card">
-        <div className="kgm-card-title"><Sparkles size={16} /> Analisis Kondisi Keuangan (AI)</div>
-        {!analysis && !isAnalyzing && (
-          <button className="kgm-btn kgm-btn-accent kgm-btn-block" onClick={runAnalysis}>
-            <Sparkles size={16} /> Buat Analisis Sekarang
-          </button>
-        )}
-        {isAnalyzing && (
-          <div style={{ textAlign: "center", padding: 16 }}>
-            <Loader2 size={22} style={{ animation: "kgm-spin 1s linear infinite" }} />
-            <style>{`@keyframes kgm-spin { to { transform: rotate(360deg); } }`}</style>
-            <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Sedang menyusun analisis...</div>
-          </div>
-        )}
-        {analysisError && (
-          <div style={{ background: "var(--expense-light)", color: "var(--expense)", padding: 10, borderRadius: 10, fontSize: 13 }}>{analysisError}</div>
-        )}
-        {analysis && !isAnalyzing && (
-          <>
-            <div className="kgm-analysis-text">{analysis}</div>
-            <button className="kgm-btn kgm-btn-ghost kgm-btn-block" style={{ marginTop: 12 }} onClick={runAnalysis}>
-              <RefreshCw size={15} /> Buat Ulang Analisis
-            </button>
-          </>
-        )}
-      </div>
-    </>
-  );
-}
+    function renderTabel() {
+        const tbody = document.getElementById('tabel-body');
+        tbody.innerHTML = '';
+        
+        let inTotal = 0, outTotal = 0, totalMelon = 0;
+
+        transaksi.forEach(t => {
+            if(t.jenis === 'pemasukan') { inTotal += t.nominal; totalMelon += t.berat; }
+            else { outTotal += t.nominal; }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${t.keterangan}</td>
+                <td style="color: ${t.jenis === 'pemasukan' ? 'var(--primary)' : 'var(--danger)'}; font-weight:bold;">${t.jenis}</td>
+                <td>${t.berat > 0 ? t.berat + ' Kg' : '-'}</td>
+                <td>${formatRp(t.nominal)}</td>
+                <td class="data-ignore-print">
+                    <button class="action-btn btn-edit" onclick="editData(${t.id})">Edit</button>
+                    <button class="action-btn btn-delete" onclick="hapusData(${t.id})">Hapus</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('tot-in').innerText = formatRp(inTotal);
+        document.getElementById('tot-out').innerText = formatRp(outTotal);
+        document.getElementById('tot-saldo').innerText = formatRp(inTotal - outTotal);
+        document.getElementById('tot-melon').innerText = totalMelon + ' Kg';
+    }
+
+    // Fitur 1: Export PDF
+    function exportPDF() {
+        // Sembunyikan elemen input dan tombol aksi sebelum print
+        const elementsToHide = document.querySelectorAll('.data-ignore-print');
+        elementsToHide.forEach(el => el.style.display = 'none');
+        
+        const element = document.getElementById('app-container');
+        html2pdf().from(element).save('Laporan_Akarkas_Gapoktan.pdf').then(() => {
+            // Tampilkan kembali setelah PDF selesai diunduh
+            elementsToHide.forEach(el => el.style.display = '');
+        });
+    }
+
+    // Fitur 2: Voice Chat Bot Sederhana menggunakan Web Speech API
+    function startVoiceBot() {
+        const statusText = document.getElementById('voice-status');
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Maaf, browser Anda belum mendukung fitur input suara.');
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'id-ID';
+        
+        recognition.onstart = function() {
+            statusText.style.display = 'block';
+        };
+
+        recognition.onresult = function(event) {
+            const hasilSuara = event.results[0][0].transcript.toLowerCase();
+            statusText.style.display = 'none';
+            
+            // Logika NLP (Natural Language Processing) Sederhana
+            let jenis = 'pemasukan';
+            if(hasilSuara.includes('keluar') || hasilSuara.includes('beli') || hasilSuara.includes('bayar')) jenis = 'pengeluaran';
+            
+            // Ekstrak angka untuk nominal
+            const angkaArr = hasilSuara.match(/\d+/g);
+            let nominal = 0;
+            let berat = 0;
+
+            if(angkaArr) {
+                // Asumsi: Angka terkecil biasanya berat (kilo), angka terbesar biasanya rupiah (nominal)
+                const angka1 = parseInt(angkaArr[0]);
+                const angka2 = angkaArr.length > 1 ? parseInt(angkaArr[1]) : 0;
+                
+                // Menyesuaikan sebutan seperti "ribu" atau "juta"
+                let pengali = 1;
+                if(hasilSuara.includes('juta')) pengali = 1000000;
+                else if(hasilSuara.includes('ribu')) pengali = 1000;
+
+                // Jika ada dua angka yang ditangkap
+                if(angka2 > 0) {
+                    berat = angka1 < angka2 ? angka1 : angka2; // Yang kecil dianggap kilo
+                    nominal = (angka1 > angka2 ? angka1 : angka2) * pengali;
+                } else {
+                    nominal = angka1 * pengali;
+                }
+            }
+
+            document.getElementById('jenis').value = jenis;
+            document.getElementById('keterangan').value = hasilSuara; // Isi keterangan dengan teks asli
+            document.getElementById('nominal').value = nominal;
+            document.getElementById('berat').value = berat;
+            
+            alert(`Sistem menangkap ucapan: "${hasilSuara}". \nSilakan periksa kembali nominal dan berat di form, lalu klik Simpan Data.`);
+        };
+
+        recognition.onerror = function(event) {
+            statusText.style.display = 'none';
+            alert('Gagal mendengarkan. Silakan coba lagi.');
+        };
+
+        recognition.start();
+    }
+</script>
+</body>
+</html>
