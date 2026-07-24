@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- Konfigurasi PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2b7a5c">
+    <link rel="apple-touch-icon" href="icon perusahaan (2)_2.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AkarKas - Buku Kas Digital</title>
@@ -823,6 +827,15 @@
         setTodayDate();
         setJenis('pengeluaran'); 
     };
+<script>
+    // Mendaftarkan Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker berhasil didaftarkan!', reg.scope))
+                .catch(err => console.error('Service Worker gagal didaftarkan', err));
+        });
+    }
 </script>
 </body>
 </html>
