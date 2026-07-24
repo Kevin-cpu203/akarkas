@@ -2,7 +2,7 @@ const CACHE_NAME = 'akarkas-v1';
 const urlsToCache = [
   './',
   './index.html',
-  './icon perusahaan (2)_2.png'
+  './icon.png'
 ];
 
 // Menyimpan file ke cache saat aplikasi pertama kali diinstal
