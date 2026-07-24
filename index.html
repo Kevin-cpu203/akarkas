@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AkarKas - Buku Kas Digital</title>
     
-    <!-- FontAwesome & Chart.js -->
+    <!-- FontAwesome, Chart.js, & html2pdf.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tambahan library untuk konversi PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -43,7 +45,7 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* --- GLOBAL HEADER (Menempel di semua menu) --- */
+        /* --- GLOBAL HEADER --- */
         .global-header {
             display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
             background: var(--white); border-bottom: 1px solid var(--border-color);
@@ -57,17 +59,16 @@
         
         .header-actions { display: flex; gap: 8px; }
         .btn-entri { background: var(--green); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .btn-share { background: var(--teal); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-share { background: var(--teal); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-share:disabled { background: #95a5a6; cursor: not-allowed; }
 
-        /* Judul Halaman Spesifik */
         .page-title { padding: 20px 20px 5px 20px; color: var(--text-dark); font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin: 0; }
 
-        /* --- SISTEM NAVIGASI (SPA) --- */
+        /* --- SISTEM NAVIGASI --- */
         .view-section { display: none; padding-bottom: 120px; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Floating Nav */
         .floating-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: calc(100% - 40px); max-width: 440px;
@@ -171,14 +172,15 @@
     <!-- ==================== GLOBAL HEADER ==================== -->
     <div class="global-header">
         <div class="global-title-box">
-            <img src="icon perusahaan (2).png" alt="Logo">
+            <img src="icon perusahaan (2)_2.png" alt="Logo">
             <div class="global-title-text">
                 <h2>AkarKas- Buku Kas Digital</h2>
                 <p>Pencatatan keuangan greenhouse</p>
             </div>
         </div>
         <div class="header-actions">
-            <button class="btn-share" onclick="alert('Menu bagikan PDF/Laporan...')"><i class="fa-solid fa-share-nodes"></i> Bagikan</button>
+            <!-- Fungsi onclick telah diubah ke unduhLaporanPDF -->
+            <button class="btn-share" onclick="unduhLaporanPDF(this)"><i class="fa-solid fa-download"></i> Bagikan</button>
             <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
         </div>
     </div>
@@ -382,12 +384,8 @@
 </div>
 
 <script>
-    // --- DATABASE SEMENTARA ---
-    let transaksi = [
-        { id: 1, jenis: 'pemasukan', kategori: 'Penjualan Melon', nominal: 5000000, berat: 250, tanggal: '2026-07-20', catatan: 'Panen tahap 1' },
-        { id: 2, jenis: 'pengeluaran', kategori: 'Pupuk', nominal: 1200000, berat: 0, tanggal: '2026-07-18', catatan: 'Beli AB mix' },
-        { id: 3, jenis: 'pengeluaran', kategori: 'Listrik & Air', nominal: 300000, berat: 0, tanggal: '2026-07-15', catatan: '' }
-    ];
+    // --- DATABASE DIKOSONGKAN (Mulai dari Nol) ---
+    let transaksi = [];
 
     let jenisAktif = 'pengeluaran';
     let filterSaatIni = 'semua';
@@ -474,19 +472,22 @@
         document.getElementById('b-out').innerText = formatRp(outTotal);
         document.getElementById('chart-center-saldo').innerText = formatRp(saldoTotal);
 
+        let dataGrafik = [inTotal, outTotal];
+        let warnaGrafik = ['#2b7a5c', '#e67e22'];
+        if(inTotal === 0 && outTotal === 0) {
+            dataGrafik = [1];
+            warnaGrafik = ['#e0e0e0'];
+        }
+
         const ctx = document.getElementById('berandaChart').getContext('2d');
         if(bChart) bChart.destroy();
         bChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Pemasukan', 'Pengeluaran'],
-                datasets: [{
-                    data: [inTotal || 1, outTotal || 1],
-                    backgroundColor: ['#2b7a5c', '#e67e22'],
-                    borderWidth: 0, hoverOffset: 4
-                }]
+                labels: (inTotal === 0 && outTotal === 0) ? ['Belum ada data'] : ['Pemasukan', 'Pengeluaran'],
+                datasets: [{ data: dataGrafik, backgroundColor: warnaGrafik, borderWidth: 0, hoverOffset: 4 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '78%', plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '78%', plugins: { legend: { display: false }, tooltip: { enabled: (inTotal !== 0 || outTotal !== 0) } } }
         });
     }
 
@@ -562,7 +563,10 @@
         }
 
         if(dataDitampilkan.length === 0) {
-            list.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:30px;">Belum ada data untuk kategori ini.</p>`;
+            list.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:40px;">
+                <i class="fa-solid fa-folder-open" style="font-size:40px; margin-bottom:10px; opacity:0.3;"></i>
+                <p>Belum ada data transaksi.</p>
+            </div>`;
             return;
         }
 
@@ -592,20 +596,16 @@
     function bukaEdit(id) {
         const tx = transaksi.find(t => t.id === id);
         if(!tx) return;
-
         document.getElementById('edit-id').value = tx.id;
         document.getElementById('edit-kategori').value = tx.kategori;
         document.getElementById('edit-nominal').value = tx.nominal;
         document.getElementById('edit-berat').value = tx.berat || '';
         document.getElementById('edit-tanggal').value = tx.tanggal;
         document.getElementById('edit-catatan').value = tx.catatan || '';
-        
         document.getElementById('modal-edit').style.display = 'flex';
     }
 
-    function tutupEdit() {
-        document.getElementById('modal-edit').style.display = 'none';
-    }
+    function tutupEdit() { document.getElementById('modal-edit').style.display = 'none'; }
 
     function simpanEdit() {
         const id = parseInt(document.getElementById('edit-id').value);
@@ -636,6 +636,19 @@
 
     // --- FUNGSI HALAMAN ANALISIS ---
     function renderAnalisis() {
+        const badge = document.getElementById('status-badge');
+        const teks = document.getElementById('teks-analisis');
+        const ctx = document.getElementById('analisisChart').getContext('2d');
+        
+        if(aChart) aChart.destroy();
+
+        if(transaksi.length === 0) {
+            badge.className = 'status-badge status-surplus'; badge.innerText = 'BELUM ADA DATA';
+            teks.innerHTML = `<strong>Mulai Pencatatan!</strong><br><br>Belum ada data transaksi keuangan untuk dianalisis bulan ini. Silakan catat pemasukan atau pengeluaran pertama Anda melalui menu Catat.`;
+            aChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false } });
+            return;
+        }
+
         let inTotal = 0, outTotal = 0;
         let outCategories = {};
 
@@ -648,9 +661,6 @@
         });
 
         const saldo = inTotal - outTotal;
-        const badge = document.getElementById('status-badge');
-        const teks = document.getElementById('teks-analisis');
-
         let maxCat = '-', maxVal = 0;
         for(let cat in outCategories) {
             if(outCategories[cat] > maxVal) { maxVal = outCategories[cat]; maxCat = cat; }
@@ -658,26 +668,125 @@
 
         if(saldo >= 0) {
             badge.className = 'status-badge status-surplus'; badge.innerText = 'SURPLUS';
-            teks.innerHTML = `<strong>Kinerja Bagus!</strong> Keuangan Gapoktan sedang Surplus sebesar <b>${formatRp(saldo)}</b>.<br><br>Pemasukan utama berhasil menutupi operasional. Fokuskan pemantauan pada <b>${maxCat}</b> karena ini menyedot dana terbesar bulan ini sebesar ${formatRp(maxVal)}.`;
+            teks.innerHTML = `<strong>Kinerja Bagus!</strong> Keuangan sedang Surplus sebesar <b>${formatRp(saldo)}</b>.<br><br>Pemasukan utama berhasil menutupi operasional. ${maxCat !== '-' ? `Fokuskan pemantauan pada <b>${maxCat}</b> karena ini menyedot dana terbesar bulan ini sebesar ${formatRp(maxVal)}.` : ''}`;
         } else {
             badge.className = 'status-badge status-minus'; badge.innerText = 'MINUS / DEFISIT';
             teks.innerHTML = `<strong>Perhatian:</strong> Arus kas minus <b>${formatRp(Math.abs(saldo))}</b>.<br><br>Ini wajar jika sedang dalam fase tanam dan belum panen. Kebocoran terbesar ada di pos <b>${maxCat}</b> (${formatRp(maxVal)}). Coba efisiensikan biaya di sektor tersebut.`;
         }
 
-        const ctx = document.getElementById('analisisChart').getContext('2d');
-        if(aChart) aChart.destroy();
         aChart = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: Object.keys(outCategories),
-                datasets: [{
-                    label: 'Total Rp',
-                    data: Object.values(outCategories),
-                    backgroundColor: '#e8a0a0',
-                    borderRadius: 8
-                }]
-            },
+            data: { labels: Object.keys(outCategories), datasets: [{ label: 'Total Rp', data: Object.values(outCategories), backgroundColor: '#e8a0a0', borderRadius: 8 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    }
+
+    // --- FUNGSI GENERATE PDF (FITUR BARU) ---
+    function unduhLaporanPDF(btnElement) {
+        if (transaksi.length === 0) {
+            alert("Belum ada data transaksi yang bisa dicetak ke PDF!");
+            return;
+        }
+
+        // Tampilkan status "Menyiapkan"
+        const originalText = btnElement.innerHTML;
+        btnElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+        btnElement.disabled = true;
+
+        // Hitung akumulasi & Siapkan Tabel
+        let inTotal = 0, outTotal = 0;
+        let tbodyHTML = '';
+        
+        // Urutkan transaksi dari tanggal terlama ke terbaru untuk laporan
+        let dataCetak = [...transaksi].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+        dataCetak.forEach(t => {
+            if(t.jenis === 'pemasukan') inTotal += t.nominal;
+            else outTotal += t.nominal;
+            
+            const isMasuk = t.jenis === 'pemasukan';
+            tbodyHTML += `
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #d1d9ce; text-align: center;">${formatDateRead(t.tanggal)}</td>
+                    <td style="padding: 10px; border: 1px solid #d1d9ce; font-weight: bold;">
+                        ${t.kategori}
+                        ${t.berat > 0 ? `<br><span style="font-weight: normal; font-size: 11px; color: #6b726a;">Volume: ${t.berat} kg</span>` : ''}
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #d1d9ce; text-align: center; color: ${isMasuk ? '#2b7a5c' : '#c0392b'}; font-weight: bold;">
+                        ${isMasuk ? 'Pemasukan' : 'Pengeluaran'}
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #d1d9ce; text-align: right;">${formatRp(t.nominal)}</td>
+                    <td style="padding: 10px; border: 1px solid #d1d9ce; font-size: 11px;">${t.catatan || '-'}</td>
+                </tr>
+            `;
+        });
+        
+        const saldoTotal = inTotal - outTotal;
+
+        // Susun template HTML untuk PDF (Gaya modern, bersih & korporat)
+        const pdfContainer = document.createElement('div');
+        pdfContainer.innerHTML = `
+            <div style="padding: 30px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1f291e;">
+                <!-- Header Dokumen -->
+                <div style="text-align: center; border-bottom: 2px solid #2b7a5c; padding-bottom: 20px; margin-bottom: 30px;">
+                    <h1 style="margin: 0 0 5px 0; color: #2b7a5c; font-size: 26px; text-transform: uppercase; letter-spacing: 1px;">Laporan Keuangan AkarKas</h1>
+                    <p style="margin: 0; color: #6b726a; font-size: 14px;">Buku Kas Digital - Pencatatan Keuangan Greenhouse</p>
+                    <p style="margin: 8px 0 0 0; color: #1f291e; font-size: 12px; font-weight: bold;">Dicetak pada: ${formatDateRead(new Date().toISOString())}</p>
+                </div>
+                
+                <!-- Ringkasan Keuangan (3 Kotak) -->
+                <div style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 30px;">
+                    <div style="flex: 1; background-color: #f5f8f4; padding: 20px; border-radius: 8px; border: 1px solid #c4d1c4; text-align: center;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #385d34; text-transform: uppercase;">Total Saldo Netto</p>
+                        <h2 style="margin: 0; font-size: 20px; color: #1f291e;">${formatRp(saldoTotal)}</h2>
+                    </div>
+                    <div style="flex: 1; background-color: #e4f0d9; padding: 20px; border-radius: 8px; border: 1px solid #c4d1c4; text-align: center;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #2b7a5c; text-transform: uppercase;">Total Pemasukan</p>
+                        <h2 style="margin: 0; font-size: 20px; color: #2b7a5c;">${formatRp(inTotal)}</h2>
+                    </div>
+                    <div style="flex: 1; background-color: #faeaea; padding: 20px; border-radius: 8px; border: 1px solid #e8a0a0; text-align: center;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #c0392b; text-transform: uppercase;">Total Pengeluaran</p>
+                        <h2 style="margin: 0; font-size: 20px; color: #c0392b;">${formatRp(outTotal)}</h2>
+                    </div>
+                </div>
+
+                <!-- Tabel Riwayat -->
+                <h3 style="font-size: 16px; margin: 0 0 15px 0; color: #385d34; border-left: 4px solid #2b7a5c; padding-left: 10px;">Rincian Riwayat Transaksi</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background-color: #2b7a5c; color: white;">
+                            <th style="padding: 12px; border: 1px solid #2b7a5c; text-align: center; width: 15%;">Tanggal</th>
+                            <th style="padding: 12px; border: 1px solid #2b7a5c; text-align: left; width: 25%;">Kategori / Rincian</th>
+                            <th style="padding: 12px; border: 1px solid #2b7a5c; text-align: center; width: 15%;">Jenis</th>
+                            <th style="padding: 12px; border: 1px solid #2b7a5c; text-align: right; width: 20%;">Nominal</th>
+                            <th style="padding: 12px; border: 1px solid #2b7a5c; text-align: left; width: 25%;">Catatan Tambahan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tbodyHTML}
+                    </tbody>
+                </table>
+                
+                <!-- Footer Info -->
+                <div style="margin-top: 40px; text-align: center; color: #6b726a; font-size: 11px;">
+                    <p>Dokumen ini di-generate secara otomatis oleh sistem Aplikasi AkarKas.</p>
+                </div>
+            </div>
+        `;
+
+        // Konfigurasi & Eksekusi html2pdf
+        const options = {
+            margin:       [5, 5, 5, 5],
+            filename:     'Laporan_Keuangan_AkarKas.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(options).from(pdfContainer).save().then(() => {
+            // Setelah PDF selesai terunduh, normalkan tombol kembali
+            btnElement.innerHTML = originalText;
+            btnElement.disabled = false;
         });
     }
 
