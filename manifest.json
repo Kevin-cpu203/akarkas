@@ -1,23 +1,21 @@
 {
-  "name": "AkarKas Finance",
+  "name": "AkarKas - Buku Kas Digital",
   "short_name": "AkarKas",
-  "description": "Aplikasi pencatatan keuangan Smart Greenhouse untuk petani milenial.",
-  "start_url": "index.html",
+  "description": "Aplikasi keuangan berbasis web untuk pengelolaan kas greenhouse",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#16a34a",
+  "background_color": "#eef3e6",
+  "theme_color": "#2b7a5c",
   "icons": [
     {
-      "src": "assets/icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "icon perusahaan (2)_2.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "assets/icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "icon perusahaan (2)_2.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
