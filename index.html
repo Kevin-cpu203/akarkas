@@ -183,7 +183,6 @@
             </div>
         </div>
         <div class="header-actions">
-            <!-- Fungsi onclick telah diubah ke unduhLaporanPDF -->
             <button class="btn-share" onclick="unduhLaporanPDF(this)"><i class="fa-solid fa-download"></i> Bagikan</button>
             <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
         </div>
@@ -692,16 +691,13 @@
             return;
         }
 
-        // Tampilkan status "Menyiapkan"
         const originalText = btnElement.innerHTML;
         btnElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
         btnElement.disabled = true;
 
-        // Hitung akumulasi & Siapkan Tabel
         let inTotal = 0, outTotal = 0;
         let tbodyHTML = '';
         
-        // Urutkan transaksi dari tanggal terlama ke terbaru untuk laporan
         let dataCetak = [...transaksi].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
         dataCetak.forEach(t => {
@@ -727,18 +723,15 @@
         
         const saldoTotal = inTotal - outTotal;
 
-        // Susun template HTML untuk PDF (Gaya modern, bersih & korporat)
         const pdfContainer = document.createElement('div');
         pdfContainer.innerHTML = `
             <div style="padding: 30px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1f291e;">
-                <!-- Header Dokumen -->
                 <div style="text-align: center; border-bottom: 2px solid #2b7a5c; padding-bottom: 20px; margin-bottom: 30px;">
                     <h1 style="margin: 0 0 5px 0; color: #2b7a5c; font-size: 26px; text-transform: uppercase; letter-spacing: 1px;">Laporan Keuangan AkarKas</h1>
                     <p style="margin: 0; color: #6b726a; font-size: 14px;">Buku Kas Digital - Pencatatan Keuangan Greenhouse</p>
                     <p style="margin: 8px 0 0 0; color: #1f291e; font-size: 12px; font-weight: bold;">Dicetak pada: ${formatDateRead(new Date().toISOString())}</p>
                 </div>
                 
-                <!-- Ringkasan Keuangan (3 Kotak) -->
                 <div style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 30px;">
                     <div style="flex: 1; background-color: #f5f8f4; padding: 20px; border-radius: 8px; border: 1px solid #c4d1c4; text-align: center;">
                         <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #385d34; text-transform: uppercase;">Total Saldo Netto</p>
@@ -754,7 +747,6 @@
                     </div>
                 </div>
 
-                <!-- Tabel Riwayat -->
                 <h3 style="font-size: 16px; margin: 0 0 15px 0; color: #385d34; border-left: 4px solid #2b7a5c; padding-left: 10px;">Rincian Riwayat Transaksi</h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                     <thead>
@@ -771,14 +763,12 @@
                     </tbody>
                 </table>
                 
-                <!-- Footer Info -->
                 <div style="margin-top: 40px; text-align: center; color: #6b726a; font-size: 11px;">
                     <p>Dokumen ini di-generate secara otomatis oleh sistem Aplikasi AkarKas.</p>
                 </div>
             </div>
         `;
 
-        // Konfigurasi & Eksekusi html2pdf
         const options = {
             margin:       [5, 5, 5, 5],
             filename:     'Laporan_Keuangan_AkarKas.pdf',
@@ -788,7 +778,6 @@
         };
 
         html2pdf().set(options).from(pdfContainer).save().then(() => {
-            // Setelah PDF selesai terunduh, normalkan tombol kembali
             btnElement.innerHTML = originalText;
             btnElement.disabled = false;
         });
@@ -827,8 +816,10 @@
         setTodayDate();
         setJenis('pengeluaran'); 
     };
+</script>
+
+<!-- Mendaftarkan Service Worker PWA -->
 <script>
-    // Mendaftarkan Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -837,5 +828,6 @@
         });
     }
 </script>
+
 </body>
 </html>
