@@ -108,11 +108,10 @@
         .toggle-btn.active-in { border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-light); }
         .toggle-btn.active-out { border-color: var(--expense-border); color: var(--expense-text); background: var(--expense-bg); }
         
-        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; }
         .pill { padding: 8px 16px; background: var(--bg-app); border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-weight: 600; transition: 0.2s; }
         .pill.active { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-dark); }
         
-        /* Modifikasi Form Control berdasar gambar */
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--form-label); }
         .form-control { 
@@ -121,11 +120,10 @@
             border-radius: 12px; font-size: 16px; 
             background-color: var(--form-bg); 
             color: var(--text-dark);
-            font-family: monospace; /* Mengikuti gaya angka di gambar */
+            font-family: monospace; 
         }
         .form-control::placeholder { color: #a3b1a3; font-family: 'Nunito', sans-serif; }
         .form-control:focus { outline: none; border-color: var(--primary-dark); }
-        
         textarea.form-control { font-family: 'Nunito', sans-serif; resize: vertical; min-height: 80px; }
         
         .btn-submit { 
@@ -142,6 +140,10 @@
 
         /* --- RIWAYAT --- */
         .list-container { padding: 0 20px; }
+        .filter-riwayat { display: flex; gap: 10px; padding: 0 20px 15px 20px; }
+        .filter-btn { flex: 1; padding: 10px 5px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .filter-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+        
         .tx-item { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .tx-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 18px; margin-right: 15px; }
         .i-in { background: var(--primary-light); color: var(--primary-dark); }
@@ -150,7 +152,20 @@
         .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); }
         .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
         .tx-amount { text-align: right; }
-        .btn-del { color: #e74c3c; background: none; border: none; padding: 5px; cursor: pointer; margin-left: 5px; }
+        
+        /* Tombol Edit & Hapus */
+        .action-btns { display: flex; justify-content: flex-end; margin-top: 5px; gap: 8px; }
+        .btn-edit { color: #f39c12; background: #fdf5e6; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-del { color: #e74c3c; background: #faeaea; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-edit:hover, .btn-del:hover { filter: brightness(0.9); }
+
+        /* MODAL EDIT */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end; }
+        .modal-content { background: var(--bg-app); width: 100%; max-width: 480px; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 25px 20px; animation: slideUp 0.3s; max-height: 90vh; overflow-y: auto; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 18px; color: var(--text-dark); }
+        .btn-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
 
         /* --- ANALISIS --- */
         .analisis-card { background: white; padding: 25px 20px; border-radius: 24px; margin: 0 20px 20px 20px; text-align: center; }
@@ -250,7 +265,7 @@
             <div style="text-align:left; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-volume-high"></i> Catat dengan Suara</div>
             <button class="mic-btn" onclick="startVoiceBot()"><i class="fa-solid fa-microphone"></i></button>
             <h3 style="margin:0 0 10px 0; font-size:16px;">Ketuk untuk mulai bicara</h3>
-            <p style="font-size:12px; color:var(--text-muted);">Contoh: "Jual melon 300 kilo dapat 4 juta"</p>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.5;">Contoh: "Beli pupuk AB Mix 500 ribu"<br>atau "Jual melon 3 kilo harga 50 ribu"</p>
         </div>
 
         <div style="text-align: center; margin-bottom: 20px; color: var(--text-muted); font-size: 14px;">--- atau isi manual ---</div>
@@ -261,18 +276,16 @@
                 <button class="toggle-btn active-out" id="btn-out" onclick="setJenis('pengeluaran')"><i class="fa-solid fa-arrow-down-right-dots"></i> Pengeluaran</button>
             </div>
 
+            <!-- Kategori akan dirender dinamis dari JavaScript -->
             <div class="form-group" style="margin-bottom: 25px;">
                 <label style="margin-bottom: 10px; display:block;">Pilih Kategori</label>
-                <input type="hidden" id="input-kategori" value="Pupuk & Obat">
-                <div class="category-pills">
-                    <span class="pill" onclick="selectPill(this)">Penjualan Melon</span>
-                    <span class="pill active" onclick="selectPill(this)">Pupuk & Obat</span>
-                    <span class="pill" onclick="selectPill(this)">Tenaga Kerja</span>
-                    <span class="pill" onclick="selectPill(this)">Lainnya</span>
+                <input type="hidden" id="input-kategori">
+                <div class="category-pills" id="kategori-container">
+                    <!-- Pills dimuat otomatis -->
                 </div>
+                <input type="text" id="input-kategori-lainnya" class="form-control" style="display:none; margin-top:10px;" placeholder="Ketik rincian kategori di sini...">
             </div>
 
-            <!-- Form Presisi Sesuai Gambar -->
             <div class="form-group">
                 <label>Jumlah (Rp)</label>
                 <input type="number" id="input-nominal" class="form-control" placeholder="0">
@@ -290,7 +303,7 @@
 
             <div class="form-group">
                 <label>Catatan (opsional)</label>
-                <textarea id="input-catatan" class="form-control" placeholder="Contoh: panen minggu ke-3"></textarea>
+                <textarea id="input-catatan" class="form-control"></textarea>
             </div>
 
             <button class="btn-submit" onclick="simpanManual()"><i class="fa-solid fa-plus"></i> Simpan Transaksi</button>
@@ -299,9 +312,17 @@
 
     <!-- ==================== MENU 3: RIWAYAT ==================== -->
     <div id="view-riwayat" class="view-section">
-        <div class="header-beranda" style="margin-bottom: 20px;">
+        <div class="header-beranda" style="margin-bottom: 15px;">
             <div class="header-title-box"><h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2></div>
         </div>
+        
+        <!-- Filter Kategori Riwayat -->
+        <div class="filter-riwayat">
+            <button class="filter-btn active" id="filter-semua" onclick="filterRiwayat('semua')">Semua</button>
+            <button class="filter-btn" id="filter-in" onclick="filterRiwayat('pemasukan')">Pemasukan</button>
+            <button class="filter-btn" id="filter-out" onclick="filterRiwayat('pengeluaran')">Pengeluaran</button>
+        </div>
+
         <div class="list-container" id="riwayat-list">
             <!-- Data riwayat masuk ke sini -->
         </div>
@@ -326,6 +347,40 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL EDIT (BARU) ==================== -->
+    <div class="modal-overlay" id="modal-edit">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-pen"></i> Edit Transaksi</h3>
+                <button class="btn-close" onclick="tutupEdit()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <input type="hidden" id="edit-id">
+            
+            <div class="form-group">
+                <label>Kategori</label>
+                <input type="text" id="edit-kategori" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Jumlah (Rp)</label>
+                <input type="number" id="edit-nominal" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Berat Melon (kg)</label>
+                <input type="number" id="edit-berat" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" id="edit-tanggal" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Catatan</label>
+                <textarea id="edit-catatan" class="form-control"></textarea>
+            </div>
+            <button class="btn-submit" onclick="simpanEdit()">Simpan Perubahan</button>
+        </div>
+    </div>
+
     <!-- ==================== FLOATING NAV ==================== -->
     <div class="floating-nav">
         <div class="nav-item active" onclick="switchTab('view-beranda', this)">
@@ -345,25 +400,28 @@
 </div>
 
 <script>
-    // --- DATABASE SEMENTARA (State) ---
+    // --- DATABASE SEMENTARA ---
     let transaksi = [
         { id: 1, jenis: 'pemasukan', kategori: 'Penjualan Melon', nominal: 5000000, berat: 250, tanggal: '2026-07-20', catatan: 'Panen tahap 1' },
-        { id: 2, jenis: 'pengeluaran', kategori: 'Pupuk & Obat', nominal: 1200000, berat: 0, tanggal: '2026-07-18', catatan: 'Beli AB mix' },
+        { id: 2, jenis: 'pengeluaran', kategori: 'Pupuk', nominal: 1200000, berat: 0, tanggal: '2026-07-18', catatan: 'Beli AB mix' },
         { id: 3, jenis: 'pengeluaran', kategori: 'Listrik & Air', nominal: 300000, berat: 0, tanggal: '2026-07-15', catatan: '' }
     ];
 
     let jenisAktif = 'pengeluaran';
+    let filterSaatIni = 'semua';
     let bChart, aChart;
+    
+    // --- LIST KATEGORI DINAMIS ---
+    const katPemasukan = ['Penjualan Melon', 'Lainnya'];
+    const katPengeluaran = ['Bibit & Benih', 'Pupuk', 'Pestisida & Obat', 'Tenaga Kerja', 'Listrik & Air', 'Peralatan & Greenhouse', 'Lainnya'];
 
     const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
     
-    // Fungsi mengubah format YYYY-MM-DD ke teks terbaca
     const formatDateRead = (dateStr) => {
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
         return new Date(dateStr).toLocaleDateString('id-ID', options);
     };
 
-    // Fungsi set tanggal otomatis hari ini pada input
     const setTodayDate = () => {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -371,6 +429,38 @@
         const dd = String(today.getDate()).padStart(2, '0');
         document.getElementById('input-tanggal').value = `${yyyy}-${mm}-${dd}`;
     };
+
+    // --- LOGIKA KATEGORI ---
+    function renderKategori(jenis) {
+        const container = document.getElementById('kategori-container');
+        container.innerHTML = '';
+        const daftarKategori = jenis === 'pemasukan' ? katPemasukan : katPengeluaran;
+        const defaultKat = jenis === 'pemasukan' ? 'Penjualan Melon' : 'Pupuk'; 
+
+        daftarKategori.forEach((kat) => {
+            const isAktif = kat === defaultKat ? 'active' : '';
+            container.innerHTML += `<span class="pill ${isAktif}" onclick="selectPill(this)">${kat}</span>`;
+        });
+        
+        document.getElementById('input-kategori').value = defaultKat;
+        document.getElementById('input-kategori-lainnya').style.display = 'none';
+        document.getElementById('input-kategori-lainnya').value = '';
+    }
+
+    function selectPill(el) {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        
+        const catName = el.innerText;
+        document.getElementById('input-kategori').value = catName;
+        
+        if (catName.toLowerCase() === 'lainnya') {
+            document.getElementById('input-kategori-lainnya').style.display = 'block';
+            document.getElementById('input-kategori-lainnya').focus();
+        } else {
+            document.getElementById('input-kategori-lainnya').style.display = 'none';
+        }
+    }
 
     // --- LOGIKA SPA (Switch Tab) ---
     function switchTab(tabId, navElement = null) {
@@ -386,7 +476,7 @@
         }
 
         if(tabId === 'view-beranda') renderBeranda();
-        if(tabId === 'view-catat') setTodayDate(); // Set kalender tiap buka menu catat
+        if(tabId === 'view-catat') { setTodayDate(); } 
         if(tabId === 'view-riwayat') renderRiwayat();
         if(tabId === 'view-analisis') renderAnalisis();
     }
@@ -424,51 +514,77 @@
         const bIn = document.getElementById('btn-in'); const bOut = document.getElementById('btn-out');
         bIn.className = 'toggle-btn'; bOut.className = 'toggle-btn';
         
+        renderKategori(jenis);
+
         if (jenis === 'pemasukan') {
             bIn.classList.add('active-in');
             document.getElementById('group-berat').style.display = 'block';
+            document.getElementById('input-catatan').placeholder = 'Contoh: panen minggu ke-3';
         } else {
             bOut.classList.add('active-out');
             document.getElementById('group-berat').style.display = 'none';
+            document.getElementById('input-catatan').placeholder = 'Contoh: Perbaikan Alas Greenhouse';
         }
-    }
-
-    function selectPill(el) {
-        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('input-kategori').value = el.innerText;
     }
 
     function simpanManual() {
         const nominal = parseInt(document.getElementById('input-nominal').value);
         if(!nominal) return alert('Jumlah uang (Rp) belum diisi!');
         
+        let kategoriFinal = document.getElementById('input-kategori').value;
+        if(kategoriFinal.toLowerCase() === 'lainnya') {
+            const katLain = document.getElementById('input-kategori-lainnya').value.trim();
+            if(!katLain) return alert('Silakan tulis rincian kategori lainnya pada kotak isian!');
+            kategoriFinal = katLain; 
+        }
+
         transaksi.push({
             id: Date.now(),
             jenis: jenisAktif,
-            kategori: document.getElementById('input-kategori').value,
+            kategori: kategoriFinal,
             nominal: nominal,
             berat: parseInt(document.getElementById('input-berat').value) || 0,
             tanggal: document.getElementById('input-tanggal').value,
             catatan: document.getElementById('input-catatan').value
         });
         
-        // Reset form
         document.getElementById('input-nominal').value = '';
         document.getElementById('input-berat').value = '';
         document.getElementById('input-catatan').value = '';
         setTodayDate();
+        setJenis('pengeluaran'); 
         
         alert('Data Berhasil Disimpan!');
         switchTab('view-beranda'); 
     }
 
-    // --- FUNGSI HALAMAN RIWAYAT ---
+    // --- FUNGSI HALAMAN RIWAYAT & FILTER ---
+    function filterRiwayat(jenis) {
+        filterSaatIni = jenis;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        
+        if(jenis === 'semua') document.getElementById('filter-semua').classList.add('active');
+        if(jenis === 'pemasukan') document.getElementById('filter-in').classList.add('active');
+        if(jenis === 'pengeluaran') document.getElementById('filter-out').classList.add('active');
+        
+        renderRiwayat();
+    }
+
     function renderRiwayat() {
         const list = document.getElementById('riwayat-list');
         list.innerHTML = '';
         
-        [...transaksi].reverse().forEach(t => {
+        let dataDitampilkan = [...transaksi].reverse();
+        if(filterSaatIni !== 'semua') {
+            dataDitampilkan = dataDitampilkan.filter(t => t.jenis === filterSaatIni);
+        }
+
+        if(dataDitampilkan.length === 0) {
+            list.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:30px;">Belum ada data untuk kategori ini.</p>`;
+            return;
+        }
+
+        dataDitampilkan.forEach(t => {
             const isMasuk = t.jenis === 'pemasukan';
             list.innerHTML += `
                 <div class="tx-item">
@@ -480,15 +596,57 @@
                     </div>
                     <div class="tx-amount">
                         <h4 style="color: ${isMasuk ? 'var(--primary-dark)' : 'var(--expense-text)'}">${isMasuk ? '+' : '-'}${formatRp(t.nominal)}</h4>
-                        <button class="btn-del" onclick="hapusTx(${t.id})"><i class="fa-solid fa-trash"></i></button>
+                        <div class="action-btns">
+                            <button class="btn-edit" onclick="bukaEdit(${t.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-del" onclick="hapusTx(${t.id})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 </div>
             `;
         });
     }
 
+    // --- FUNGSI EDIT MODAL ---
+    function bukaEdit(id) {
+        const tx = transaksi.find(t => t.id === id);
+        if(!tx) return;
+
+        document.getElementById('edit-id').value = tx.id;
+        document.getElementById('edit-kategori').value = tx.kategori;
+        document.getElementById('edit-nominal').value = tx.nominal;
+        document.getElementById('edit-berat').value = tx.berat || '';
+        document.getElementById('edit-tanggal').value = tx.tanggal;
+        document.getElementById('edit-catatan').value = tx.catatan || '';
+        
+        document.getElementById('modal-edit').style.display = 'flex';
+    }
+
+    function tutupEdit() {
+        document.getElementById('modal-edit').style.display = 'none';
+    }
+
+    function simpanEdit() {
+        const id = parseInt(document.getElementById('edit-id').value);
+        const index = transaksi.findIndex(t => t.id === id);
+        
+        if(index !== -1) {
+            const nominalBaru = parseInt(document.getElementById('edit-nominal').value);
+            if(!nominalBaru) return alert("Nominal tidak boleh kosong!");
+
+            transaksi[index].kategori = document.getElementById('edit-kategori').value;
+            transaksi[index].nominal = nominalBaru;
+            transaksi[index].berat = parseInt(document.getElementById('edit-berat').value) || 0;
+            transaksi[index].tanggal = document.getElementById('edit-tanggal').value;
+            transaksi[index].catatan = document.getElementById('edit-catatan').value;
+
+            tutupEdit();
+            renderRiwayat();
+            alert("Perubahan berhasil disimpan!");
+        }
+    }
+
     function hapusTx(id) {
-        if(confirm('Hapus transaksi ini?')) {
+        if(confirm('Yakin ingin menghapus transaksi ini?')) {
             transaksi = transaksi.filter(t => t.id !== id);
             renderRiwayat();
         }
@@ -568,10 +726,11 @@
         rec.start();
     }
 
-    // Inisialisasi
+    // Inisialisasi awal
     window.onload = () => { 
         renderBeranda(); 
-        setTodayDate(); 
+        setTodayDate();
+        setJenis('pengeluaran'); 
     };
 </script>
 </body>
