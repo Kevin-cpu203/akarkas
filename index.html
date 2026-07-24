@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AkarKas - Smart App</title>
+    <title>AkarKas - Buku Kas Digital</title>
     
     <!-- FontAwesome & Chart.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,6 +43,25 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
+        /* --- GLOBAL HEADER (Menempel di semua menu) --- */
+        .global-header {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
+            background: var(--white); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .global-title-box { display: flex; align-items: center; gap: 10px; }
+        .global-title-box img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .global-title-text { display: flex; flex-direction: column; }
+        .global-title-text h2 { margin: 0; font-size: 15px; font-weight: 800; color: var(--text-dark); }
+        .global-title-text p { margin: 2px 0 0 0; font-size: 10px; color: var(--text-muted); font-weight: 600;}
+        
+        .header-actions { display: flex; gap: 8px; }
+        .btn-entri { background: var(--green); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-share { background: var(--teal); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+        /* Judul Halaman Spesifik */
+        .page-title { padding: 20px 20px 5px 20px; color: var(--text-dark); font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin: 0; }
+
         /* --- SISTEM NAVIGASI (SPA) --- */
         .view-section { display: none; padding-bottom: 120px; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
@@ -65,18 +84,6 @@
         .nav-item.active { background-color: var(--primary-light); color: var(--primary-dark); }
 
         /* --- BERANDA --- */
-        .header-beranda {
-            display: flex; justify-content: space-between; align-items: center; padding: 20px;
-            background: var(--white); border-bottom: 1px solid var(--border-color);
-        }
-        .header-title-box { display: flex; align-items: center; gap: 10px; }
-        .header-title-box img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
-        .header-title-box h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text-dark); }
-        
-        .header-actions { display: flex; gap: 8px; }
-        .btn-entri { background: var(--green); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .btn-share { background: var(--teal); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        
         .filter-bar { display: flex; gap: 10px; padding: 15px 20px; }
         .filter-select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: var(--white); color: var(--text-muted); font-weight: 600; font-size: 13px; }
 
@@ -100,7 +107,7 @@
         .chart-center-text h3 { margin: 0; font-size: 18px; color: var(--text-dark); font-weight: 800; }
 
         /* --- CATAT --- */
-        .c-card { background: var(--white); border-radius: 24px; padding: 25px 20px; margin: 0 20px 20px 20px; }
+        .c-card { background: var(--white); border-radius: 24px; padding: 25px 20px; margin: 15px 20px 20px 20px; }
         .mic-btn { width: 90px; height: 90px; background: var(--primary-dark); color: white; border: none; border-radius: 50%; font-size: 32px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 16px rgba(56, 93, 52, 0.3); }
         
         .type-toggles { display: flex; gap: 15px; margin-bottom: 25px; }
@@ -114,33 +121,17 @@
         
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--form-label); }
-        .form-control { 
-            width: 100%; padding: 14px 16px; 
-            border: 1px solid var(--form-border); 
-            border-radius: 12px; font-size: 16px; 
-            background-color: var(--form-bg); 
-            color: var(--text-dark);
-            font-family: monospace; 
-        }
+        .form-control { width: 100%; padding: 14px 16px; border: 1px solid var(--form-border); border-radius: 12px; font-size: 16px; background-color: var(--form-bg); color: var(--text-dark); font-family: monospace; }
         .form-control::placeholder { color: #a3b1a3; font-family: 'Nunito', sans-serif; }
         .form-control:focus { outline: none; border-color: var(--primary-dark); }
         textarea.form-control { font-family: 'Nunito', sans-serif; resize: vertical; min-height: 80px; }
         
-        .btn-submit { 
-            width: 100%; padding: 16px; 
-            background: var(--btn-dark-green); color: white; 
-            border: none; border-radius: 14px; 
-            font-size: 16px; font-weight: bold; 
-            cursor: pointer; margin-top: 10px;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-            box-shadow: 0 4px 10px rgba(59, 95, 59, 0.2);
-            transition: 0.2s;
-        }
+        .btn-submit { width: 100%; padding: 16px; background: var(--btn-dark-green); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(59, 95, 59, 0.2); transition: 0.2s; }
         .btn-submit:active { transform: scale(0.98); }
 
         /* --- RIWAYAT --- */
-        .list-container { padding: 0 20px; }
-        .filter-riwayat { display: flex; gap: 10px; padding: 0 20px 15px 20px; }
+        .list-container { padding: 0 20px; margin-top: 10px;}
+        .filter-riwayat { display: flex; gap: 10px; padding: 15px 20px; }
         .filter-btn { flex: 1; padding: 10px 5px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .filter-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
         
@@ -152,12 +143,9 @@
         .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); }
         .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
         .tx-amount { text-align: right; }
-        
-        /* Tombol Edit & Hapus */
         .action-btns { display: flex; justify-content: flex-end; margin-top: 5px; gap: 8px; }
         .btn-edit { color: #f39c12; background: #fdf5e6; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
         .btn-del { color: #e74c3c; background: #faeaea; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .btn-edit:hover, .btn-del:hover { filter: brightness(0.9); }
 
         /* MODAL EDIT */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end; }
@@ -168,7 +156,7 @@
         .btn-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
 
         /* --- ANALISIS --- */
-        .analisis-card { background: white; padding: 25px 20px; border-radius: 24px; margin: 0 20px 20px 20px; text-align: center; }
+        .analisis-card { background: white; padding: 25px 20px; border-radius: 24px; margin: 15px 20px 20px 20px; text-align: center; }
         .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 800; font-size: 18px; margin-bottom: 15px; }
         .status-surplus { background: var(--primary-light); color: var(--primary-dark); }
         .status-minus { background: var(--expense-bg); color: var(--expense-text); }
@@ -180,18 +168,23 @@
 
 <div class="app-container">
 
-    <!-- ==================== MENU 1: BERANDA ==================== -->
-    <div id="view-beranda" class="view-section active">
-        <div class="header-beranda">
-            <div class="header-title-box">
-                <img src="icon perusahaan (2).png" alt="Logo">
-                <h2>AkarKas</h2>
-            </div>
-            <div class="header-actions">
-                <button class="btn-share" onclick="alert('Membuka menu bagikan PDF/Laporan...')"><i class="fa-solid fa-share-nodes"></i> Bagikan</button>
-                <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
+    <!-- ==================== GLOBAL HEADER ==================== -->
+    <div class="global-header">
+        <div class="global-title-box">
+            <img src="icon perusahaan (2).png" alt="Logo">
+            <div class="global-title-text">
+                <h2>AkarKas- Buku Kas Digital</h2>
+                <p>Pencatatan keuangan greenhouse</p>
             </div>
         </div>
+        <div class="header-actions">
+            <button class="btn-share" onclick="alert('Menu bagikan PDF/Laporan...')"><i class="fa-solid fa-share-nodes"></i> Bagikan</button>
+            <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
+        </div>
+    </div>
+
+    <!-- ==================== MENU 1: BERANDA ==================== -->
+    <div id="view-beranda" class="view-section active">
         
         <div class="filter-bar">
             <select class="filter-select">
@@ -254,14 +247,9 @@
 
     <!-- ==================== MENU 2: CATAT ==================== -->
     <div id="view-catat" class="view-section">
-        <div class="header-beranda">
-            <div class="header-title-box">
-                <i class="fa-solid fa-seedling" style="color:var(--green); font-size:24px;"></i>
-                <h2>Pencatatan Baru</h2>
-            </div>
-        </div>
+        <h2 class="page-title"><i class="fa-solid fa-seedling" style="color:var(--green);"></i> Pencatatan Baru</h2>
 
-        <div class="c-card" style="text-align: center; margin-top: 20px;">
+        <div class="c-card" style="text-align: center;">
             <div style="text-align:left; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-volume-high"></i> Catat dengan Suara</div>
             <button class="mic-btn" onclick="startVoiceBot()"><i class="fa-solid fa-microphone"></i></button>
             <h3 style="margin:0 0 10px 0; font-size:16px;">Ketuk untuk mulai bicara</h3>
@@ -276,12 +264,11 @@
                 <button class="toggle-btn active-out" id="btn-out" onclick="setJenis('pengeluaran')"><i class="fa-solid fa-arrow-down-right-dots"></i> Pengeluaran</button>
             </div>
 
-            <!-- Kategori akan dirender dinamis dari JavaScript -->
             <div class="form-group" style="margin-bottom: 25px;">
                 <label style="margin-bottom: 10px; display:block;">Pilih Kategori</label>
                 <input type="hidden" id="input-kategori">
                 <div class="category-pills" id="kategori-container">
-                    <!-- Pills dimuat otomatis -->
+                    <!-- Dimuat dari Javascript -->
                 </div>
                 <input type="text" id="input-kategori-lainnya" class="form-control" style="display:none; margin-top:10px;" placeholder="Ketik rincian kategori di sini...">
             </div>
@@ -312,11 +299,8 @@
 
     <!-- ==================== MENU 3: RIWAYAT ==================== -->
     <div id="view-riwayat" class="view-section">
-        <div class="header-beranda" style="margin-bottom: 15px;">
-            <div class="header-title-box"><h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2></div>
-        </div>
+        <h2 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2>
         
-        <!-- Filter Kategori Riwayat -->
         <div class="filter-riwayat">
             <button class="filter-btn active" id="filter-semua" onclick="filterRiwayat('semua')">Semua</button>
             <button class="filter-btn" id="filter-in" onclick="filterRiwayat('pemasukan')">Pemasukan</button>
@@ -330,9 +314,7 @@
 
     <!-- ==================== MENU 4: ANALISIS ==================== -->
     <div id="view-analisis" class="view-section">
-        <div class="header-beranda" style="margin-bottom: 20px;">
-            <div class="header-title-box"><h2><i class="fa-solid fa-chart-line"></i> Analisis Keuangan</h2></div>
-        </div>
+        <h2 class="page-title"><i class="fa-solid fa-chart-line"></i> Analisis Keuangan</h2>
         
         <div class="analisis-card">
             <h4 style="margin:0 0 10px 0; color:var(--text-muted);">Status Bulan Ini</h4>
@@ -347,7 +329,7 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL EDIT (BARU) ==================== -->
+    <!-- ==================== MODAL EDIT ==================== -->
     <div class="modal-overlay" id="modal-edit">
         <div class="modal-content">
             <div class="modal-header">
@@ -462,7 +444,7 @@
         }
     }
 
-    // --- LOGIKA SPA (Switch Tab) ---
+    // --- LOGIKA SPA ---
     function switchTab(tabId, navElement = null) {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
