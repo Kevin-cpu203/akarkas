@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas Greenhouse Melon - Smart App</title>
+    <title>AkarKas - Smart App</title>
     
     <!-- FontAwesome & Chart.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,12 +12,10 @@
 
     <style>
         :root {
-            /* Tema Beranda (Gambar 1) */
+            /* Tema Utama */
             --teal: #17a2b8;
             --green: #2b7a5c;
             --orange: #e67e22;
-            
-            /* Tema Catat & Umum (Gambar 2) */
             --bg-app: #eef3e6;
             --primary-dark: #385d34;
             --primary-light: #e4f0d9;
@@ -25,10 +23,15 @@
             --text-muted: #6b726a;
             --white: #ffffff;
             --border-color: #d1d9ce;
-            
             --expense-bg: #faeaea;
             --expense-text: #c0392b;
             --expense-border: #e8a0a0;
+            
+            /* Form Style Khusus */
+            --form-bg: #f5f8f4;
+            --form-border: #c4d1c4;
+            --form-label: #586958;
+            --btn-dark-green: #3b5f3b;
         }
 
         * { box-sizing: border-box; font-family: 'Nunito', sans-serif; }
@@ -61,49 +64,81 @@
         .nav-item i { font-size: 20px; }
         .nav-item.active { background-color: var(--primary-light); color: var(--primary-dark); }
 
-        /* --- BERANDA (GAMBAR 1) --- */
+        /* --- BERANDA --- */
         .header-beranda {
             display: flex; justify-content: space-between; align-items: center; padding: 20px;
             background: var(--white); border-bottom: 1px solid var(--border-color);
         }
-        .header-beranda h2 { margin: 0; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
-        .btn-entri { background: var(--green); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; border: none; cursor: pointer; }
+        .header-title-box { display: flex; align-items: center; gap: 10px; }
+        .header-title-box img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
+        .header-title-box h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text-dark); }
+        
+        .header-actions { display: flex; gap: 8px; }
+        .btn-entri { background: var(--green); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-share { background: var(--teal); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         
         .filter-bar { display: flex; gap: 10px; padding: 15px 20px; }
-        .filter-select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: var(--white); color: var(--text-muted); }
+        .filter-select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: var(--white); color: var(--text-muted); font-weight: 600; font-size: 13px; }
 
-        .dashboard-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px 20px 20px; }
-        .d-card { padding: 15px 10px; border-radius: 12px; color: white; position: relative; }
-        .d-card h4 { margin: 0; font-size: 11px; font-weight: 600; opacity: 0.9; }
-        .d-card h2 { margin: 5px 0 0 0; font-size: 16px; font-weight: 800; }
-        .d-card i { position: absolute; top: 10px; right: 10px; opacity: 0.4; }
-        .bg-teal { background: var(--teal); }
-        .bg-green { background: var(--green); }
-        .bg-orange { background: var(--orange); }
+        .dashboard-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px 20px 20px; }
+        .card-full { grid-column: span 2; }
+        .d-card { padding: 18px 15px; border-radius: 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .d-card h4 { margin: 0; font-size: 12px; font-weight: 600; opacity: 0.9; }
+        .d-card h2 { margin: 5px 0 0 0; font-size: 22px; font-weight: 800; }
+        .d-card i { position: absolute; top: 15px; right: 15px; font-size: 24px; opacity: 0.3; }
+        .bg-teal { background: linear-gradient(135deg, #20b2aa, var(--teal)); }
+        .bg-green { background: linear-gradient(135deg, #3498db, var(--green)); }
+        .bg-orange { background: linear-gradient(135deg, #f39c12, var(--orange)); }
 
-        .chart-box { background: white; margin: 0 20px; padding: 20px; border-radius: 15px; text-align: center; position: relative; }
+        .chart-box { background: white; margin: 0 20px; padding: 20px; border-radius: 15px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
         .chart-box h3 { text-align: left; margin-top: 0; font-size: 15px; color: var(--text-dark); }
-        .donut-container { height: 200px; position: relative; }
-        .tanam-aku { width: 60px; position: absolute; bottom: -10px; right: 10px; opacity: 0.8; }
+        
+        .donut-wrapper { position: relative; height: 200px; width: 100%; display: flex; align-items: center; justify-content: center; }
+        .donut-container { width: 100%; height: 100%; position: absolute; z-index: 1; }
+        .chart-center-text { position: absolute; z-index: 2; text-align: center; pointer-events: none; }
+        .chart-center-text p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .chart-center-text h3 { margin: 0; font-size: 18px; color: var(--text-dark); font-weight: 800; }
 
-        /* --- CATAT (GAMBAR 2) --- */
-        .header-catat { display: flex; align-items: center; padding: 20px; gap: 15px; }
-        .logo-box { width: 50px; height: 50px; background: var(--primary-dark); color: white; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+        /* --- CATAT --- */
         .c-card { background: var(--white); border-radius: 24px; padding: 25px 20px; margin: 0 20px 20px 20px; }
         .mic-btn { width: 90px; height: 90px; background: var(--primary-dark); color: white; border: none; border-radius: 50%; font-size: 32px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 16px rgba(56, 93, 52, 0.3); }
         
         .type-toggles { display: flex; gap: 15px; margin-bottom: 25px; }
-        .toggle-btn { flex: 1; padding: 15px 10px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .toggle-btn { flex: 1; padding: 15px 10px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
         .toggle-btn.active-in { border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-light); }
         .toggle-btn.active-out { border-color: var(--expense-border); color: var(--expense-text); background: var(--expense-bg); }
         
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
-        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; }
-        .pill { padding: 8px 16px; background: var(--bg-app); border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-weight: 600; }
+        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        .pill { padding: 8px 16px; background: var(--bg-app); border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-weight: 600; transition: 0.2s; }
         .pill.active { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-dark); }
-        .form-control { width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 15px; }
-        .btn-submit { width: 100%; padding: 16px; background: var(--primary-dark); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        /* Modifikasi Form Control berdasar gambar */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--form-label); }
+        .form-control { 
+            width: 100%; padding: 14px 16px; 
+            border: 1px solid var(--form-border); 
+            border-radius: 12px; font-size: 16px; 
+            background-color: var(--form-bg); 
+            color: var(--text-dark);
+            font-family: monospace; /* Mengikuti gaya angka di gambar */
+        }
+        .form-control::placeholder { color: #a3b1a3; font-family: 'Nunito', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--primary-dark); }
+        
+        textarea.form-control { font-family: 'Nunito', sans-serif; resize: vertical; min-height: 80px; }
+        
+        .btn-submit { 
+            width: 100%; padding: 16px; 
+            background: var(--btn-dark-green); color: white; 
+            border: none; border-radius: 14px; 
+            font-size: 16px; font-weight: bold; 
+            cursor: pointer; margin-top: 10px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            box-shadow: 0 4px 10px rgba(59, 95, 59, 0.2);
+            transition: 0.2s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
 
         /* --- RIWAYAT --- */
         .list-container { padding: 0 20px; }
@@ -115,7 +150,7 @@
         .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); }
         .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
         .tx-amount { text-align: right; }
-        .btn-del { color: #e74c3c; background: none; border: none; padding: 5px; cursor: pointer; }
+        .btn-del { color: #e74c3c; background: none; border: none; padding: 5px; cursor: pointer; margin-left: 5px; }
 
         /* --- ANALISIS --- */
         .analisis-card { background: white; padding: 25px 20px; border-radius: 24px; margin: 0 20px 20px 20px; text-align: center; }
@@ -133,28 +168,52 @@
     <!-- ==================== MENU 1: BERANDA ==================== -->
     <div id="view-beranda" class="view-section active">
         <div class="header-beranda">
-            <h2><i class="fa-solid fa-chart-simple" style="color:var(--green)"></i> Dashboard</h2>
-            <button class="btn-entri" onclick="switchTab('view-catat')">+ Entri Baru</button>
+            <div class="header-title-box">
+                <img src="icon perusahaan (2).png" alt="Logo">
+                <h2>AkarKas</h2>
+            </div>
+            <div class="header-actions">
+                <button class="btn-share" onclick="alert('Membuka menu bagikan PDF/Laporan...')"><i class="fa-solid fa-share-nodes"></i> Bagikan</button>
+                <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
+            </div>
         </div>
         
         <div class="filter-bar">
-            <select class="filter-select"><option>Bulan Ini (Juli)</option></select>
-            <select class="filter-select"><option>Category (All)</option></select>
+            <select class="filter-select">
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7" selected>Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+            </select>
+            <select class="filter-select">
+                <option>Semua Kategori</option>
+                <option>Pemasukan</option>
+                <option>Pengeluaran</option>
+                <option>Penjualan</option>
+            </select>
         </div>
 
         <div class="dashboard-cards">
-            <div class="d-card bg-teal">
+            <div class="d-card bg-teal card-full">
                 <i class="fa-solid fa-wallet"></i>
-                <h4>Saldo</h4>
+                <h4>Total Saldo</h4>
                 <h2 id="b-saldo">Rp 0</h2>
             </div>
             <div class="d-card bg-green">
-                <i class="fa-solid fa-sack-dollar"></i>
+                <i class="fa-solid fa-arrow-trend-up"></i>
                 <h4>Pemasukan</h4>
                 <h2 id="b-in">Rp 0</h2>
             </div>
             <div class="d-card bg-orange">
-                <i class="fa-solid fa-receipt"></i>
+                <i class="fa-solid fa-arrow-trend-down"></i>
                 <h4>Pengeluaran</h4>
                 <h2 id="b-out">Rp 0</h2>
             </div>
@@ -162,34 +221,36 @@
 
         <div class="chart-box">
             <h3>Pemasukan vs Pengeluaran <span style="float:right; color:#ccc;"><i class="fa-solid fa-clock-rotate-left"></i></span></h3>
-            <div class="donut-container">
-                <canvas id="berandaChart"></canvas>
+            <div class="donut-wrapper">
+                <div class="donut-container">
+                    <canvas id="berandaChart"></canvas>
+                </div>
+                <div class="chart-center-text">
+                    <p>Saldo Netto</p>
+                    <h3 id="chart-center-saldo">Rp 0</h3>
+                </div>
             </div>
-            <div style="font-size:12px; margin-top:10px;">
-                <span style="color:var(--green)">● Income</span> &nbsp; <span style="color:var(--orange)">● Expense</span>
-            </div>
-            <!-- Cloche Tanam Aku (Text Representation) -->
-            <div class="tanam-aku" style="font-size: 10px; font-weight: bold; color: var(--green); text-align: center; background: #eef3e6; padding: 5px; border-radius: 10px; border: 1px solid #ccc;">
-                🌱<br>Tanam aku!
+            <div style="font-size:12px; margin-top:15px; font-weight:700;">
+                <span style="color:var(--green)"><i class="fa-solid fa-circle"></i> Pemasukan</span> &nbsp;&nbsp; 
+                <span style="color:var(--orange)"><i class="fa-solid fa-circle"></i> Pengeluaran</span>
             </div>
         </div>
     </div>
 
     <!-- ==================== MENU 2: CATAT ==================== -->
     <div id="view-catat" class="view-section">
-        <div class="header-catat">
-            <div class="logo-box"><i class="fa-solid fa-seedling"></i></div>
-            <div>
-                <h1 style="margin:0; font-size:18px; font-weight:800; color:var(--text-dark);">Kas Greenhouse Melon</h1>
-                <p style="margin:0; font-size:13px; color:var(--text-muted);">Buku kas digital gapoktan</p>
+        <div class="header-beranda">
+            <div class="header-title-box">
+                <i class="fa-solid fa-seedling" style="color:var(--green); font-size:24px;"></i>
+                <h2>Pencatatan Baru</h2>
             </div>
         </div>
 
-        <div class="c-card" style="text-align: center;">
+        <div class="c-card" style="text-align: center; margin-top: 20px;">
             <div style="text-align:left; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-volume-high"></i> Catat dengan Suara</div>
             <button class="mic-btn" onclick="startVoiceBot()"><i class="fa-solid fa-microphone"></i></button>
             <h3 style="margin:0 0 10px 0; font-size:16px;">Ketuk untuk mulai bicara</h3>
-            <p style="font-size:12px; color:var(--text-muted);">Contoh: "Beli pupuk NPK 500 ribu"</p>
+            <p style="font-size:12px; color:var(--text-muted);">Contoh: "Jual melon 300 kilo dapat 4 juta"</p>
         </div>
 
         <div style="text-align: center; margin-bottom: 20px; color: var(--text-muted); font-size: 14px;">--- atau isi manual ---</div>
@@ -200,35 +261,46 @@
                 <button class="toggle-btn active-out" id="btn-out" onclick="setJenis('pengeluaran')"><i class="fa-solid fa-arrow-down-right-dots"></i> Pengeluaran</button>
             </div>
 
-            <div class="form-group">
-                <label>Kategori</label>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label style="margin-bottom: 10px; display:block;">Pilih Kategori</label>
+                <input type="hidden" id="input-kategori" value="Pupuk & Obat">
                 <div class="category-pills">
-                    <span class="pill" onclick="selectPill(this)">Panen Melon</span>
+                    <span class="pill" onclick="selectPill(this)">Penjualan Melon</span>
                     <span class="pill active" onclick="selectPill(this)">Pupuk & Obat</span>
                     <span class="pill" onclick="selectPill(this)">Tenaga Kerja</span>
-                    <span class="pill" onclick="selectPill(this)">Listrik & Air</span>
+                    <span class="pill" onclick="selectPill(this)">Lainnya</span>
                 </div>
             </div>
 
+            <!-- Form Presisi Sesuai Gambar -->
             <div class="form-group">
-                <input type="hidden" id="input-kategori" value="Pupuk & Obat">
-                <label>Nominal (Rp)</label>
-                <input type="number" id="input-nominal" class="form-control" placeholder="150000">
+                <label>Jumlah (Rp)</label>
+                <input type="number" id="input-nominal" class="form-control" placeholder="0">
             </div>
             
             <div class="form-group" id="group-berat" style="display:none;">
-                <label>Berat Melon (Kg)</label>
-                <input type="number" id="input-berat" class="form-control" placeholder="200">
+                <label>Berat Melon (kg)</label>
+                <input type="number" id="input-berat" class="form-control" placeholder="misal: 300">
             </div>
 
-            <button class="btn-submit" onclick="simpanManual()">Simpan Catatan</button>
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" id="input-tanggal" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Catatan (opsional)</label>
+                <textarea id="input-catatan" class="form-control" placeholder="Contoh: panen minggu ke-3"></textarea>
+            </div>
+
+            <button class="btn-submit" onclick="simpanManual()"><i class="fa-solid fa-plus"></i> Simpan Transaksi</button>
         </div>
     </div>
 
     <!-- ==================== MENU 3: RIWAYAT ==================== -->
     <div id="view-riwayat" class="view-section">
         <div class="header-beranda" style="margin-bottom: 20px;">
-            <h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2>
+            <div class="header-title-box"><h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2></div>
         </div>
         <div class="list-container" id="riwayat-list">
             <!-- Data riwayat masuk ke sini -->
@@ -238,16 +310,14 @@
     <!-- ==================== MENU 4: ANALISIS ==================== -->
     <div id="view-analisis" class="view-section">
         <div class="header-beranda" style="margin-bottom: 20px;">
-            <h2><i class="fa-solid fa-chart-line"></i> Analisis Keuangan</h2>
+            <div class="header-title-box"><h2><i class="fa-solid fa-chart-line"></i> Analisis Keuangan</h2></div>
         </div>
         
         <div class="analisis-card">
             <h4 style="margin:0 0 10px 0; color:var(--text-muted);">Status Bulan Ini</h4>
             <div id="status-badge" class="status-badge status-surplus">SURPLUS</div>
             
-            <div class="analisis-text" id="teks-analisis">
-                Memuat analisis...
-            </div>
+            <div class="analisis-text" id="teks-analisis">Memuat analisis...</div>
             
             <h4 style="margin:25px 0 10px 0; text-align:left;">Grafik Kategori Pengeluaran</h4>
             <div class="bar-container">
@@ -277,35 +347,46 @@
 <script>
     // --- DATABASE SEMENTARA (State) ---
     let transaksi = [
-        { id: 1, jenis: 'pemasukan', kategori: 'Panen Melon', nominal: 5000000, berat: 250, tanggal: '20 Jul 2026' },
-        { id: 2, jenis: 'pengeluaran', kategori: 'Pupuk & Obat', nominal: 1200000, berat: 0, tanggal: '18 Jul 2026' },
-        { id: 3, jenis: 'pengeluaran', kategori: 'Listrik & Air', nominal: 300000, berat: 0, tanggal: '15 Jul 2026' }
+        { id: 1, jenis: 'pemasukan', kategori: 'Penjualan Melon', nominal: 5000000, berat: 250, tanggal: '2026-07-20', catatan: 'Panen tahap 1' },
+        { id: 2, jenis: 'pengeluaran', kategori: 'Pupuk & Obat', nominal: 1200000, berat: 0, tanggal: '2026-07-18', catatan: 'Beli AB mix' },
+        { id: 3, jenis: 'pengeluaran', kategori: 'Listrik & Air', nominal: 300000, berat: 0, tanggal: '2026-07-15', catatan: '' }
     ];
 
     let jenisAktif = 'pengeluaran';
     let bChart, aChart;
 
     const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+    
+    // Fungsi mengubah format YYYY-MM-DD ke teks terbaca
+    const formatDateRead = (dateStr) => {
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        return new Date(dateStr).toLocaleDateString('id-ID', options);
+    };
+
+    // Fungsi set tanggal otomatis hari ini pada input
+    const setTodayDate = () => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        document.getElementById('input-tanggal').value = `${yyyy}-${mm}-${dd}`;
+    };
 
     // --- LOGIKA SPA (Switch Tab) ---
     function switchTab(tabId, navElement = null) {
-        // Sembunyikan semua section
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        // Hapus warna aktif dari semua menu bawah
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         
-        // Tampilkan yang dipilih
         document.getElementById(tabId).classList.add('active');
         if(navElement) navElement.classList.add('active');
         else {
-            // Jika dipanggil dari tombol (bukan nav), sesuaikan nav-nya
             const navs = document.querySelectorAll('.nav-item');
             if(tabId === 'view-catat') navs[1].classList.add('active');
             if(tabId === 'view-beranda') navs[0].classList.add('active');
         }
 
-        // Update data khusus saat tab dibuka
         if(tabId === 'view-beranda') renderBeranda();
+        if(tabId === 'view-catat') setTodayDate(); // Set kalender tiap buka menu catat
         if(tabId === 'view-riwayat') renderRiwayat();
         if(tabId === 'view-analisis') renderAnalisis();
     }
@@ -315,24 +396,25 @@
         let inTotal = 0, outTotal = 0;
         transaksi.forEach(t => { if(t.jenis === 'pemasukan') inTotal += t.nominal; else outTotal += t.nominal; });
         
-        document.getElementById('b-saldo').innerText = formatRp(inTotal - outTotal);
+        const saldoTotal = inTotal - outTotal;
+        document.getElementById('b-saldo').innerText = formatRp(saldoTotal);
         document.getElementById('b-in').innerText = formatRp(inTotal);
         document.getElementById('b-out').innerText = formatRp(outTotal);
+        document.getElementById('chart-center-saldo').innerText = formatRp(saldoTotal);
 
-        // Chart Donut
         const ctx = document.getElementById('berandaChart').getContext('2d');
         if(bChart) bChart.destroy();
         bChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Income', 'Expense'],
+                labels: ['Pemasukan', 'Pengeluaran'],
                 datasets: [{
-                    data: [inTotal || 1, outTotal || 1], // fallback agar chart tidak hilang
+                    data: [inTotal || 1, outTotal || 1],
                     backgroundColor: ['#2b7a5c', '#e67e22'],
                     borderWidth: 0, hoverOffset: 4
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '78%', plugins: { legend: { display: false } } }
         });
     }
 
@@ -359,7 +441,7 @@
 
     function simpanManual() {
         const nominal = parseInt(document.getElementById('input-nominal').value);
-        if(!nominal) return alert('Isi nominal uangnya!');
+        if(!nominal) return alert('Jumlah uang (Rp) belum diisi!');
         
         transaksi.push({
             id: Date.now(),
@@ -367,13 +449,18 @@
             kategori: document.getElementById('input-kategori').value,
             nominal: nominal,
             berat: parseInt(document.getElementById('input-berat').value) || 0,
-            tanggal: new Date().toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'})
+            tanggal: document.getElementById('input-tanggal').value,
+            catatan: document.getElementById('input-catatan').value
         });
         
+        // Reset form
         document.getElementById('input-nominal').value = '';
         document.getElementById('input-berat').value = '';
-        alert('Tersimpan!');
-        switchTab('view-beranda'); // Balik ke dashboard
+        document.getElementById('input-catatan').value = '';
+        setTodayDate();
+        
+        alert('Data Berhasil Disimpan!');
+        switchTab('view-beranda'); 
     }
 
     // --- FUNGSI HALAMAN RIWAYAT ---
@@ -388,7 +475,8 @@
                     <div class="tx-icon ${isMasuk ? 'i-in' : 'i-out'}"><i class="fa-solid ${isMasuk ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></div>
                     <div class="tx-details">
                         <h4>${t.kategori}</h4>
-                        <p>${t.tanggal} ${t.berat > 0 ? '| 🍈 '+t.berat+'Kg' : ''}</p>
+                        <p>${formatDateRead(t.tanggal)} ${t.berat > 0 ? '| 🍈 '+t.berat+'Kg' : ''}</p>
+                        ${t.catatan ? `<p style="font-style:italic; color:#999; margin-top:2px;">"${t.catatan}"</p>` : ''}
                     </div>
                     <div class="tx-amount">
                         <h4 style="color: ${isMasuk ? 'var(--primary-dark)' : 'var(--expense-text)'}">${isMasuk ? '+' : '-'}${formatRp(t.nominal)}</h4>
@@ -423,7 +511,6 @@
         const badge = document.getElementById('status-badge');
         const teks = document.getElementById('teks-analisis');
 
-        // Mencari pengeluaran terbesar
         let maxCat = '-', maxVal = 0;
         for(let cat in outCategories) {
             if(outCategories[cat] > maxVal) { maxVal = outCategories[cat]; maxCat = cat; }
@@ -437,7 +524,6 @@
             teks.innerHTML = `<strong>Perhatian:</strong> Arus kas minus <b>${formatRp(Math.abs(saldo))}</b>.<br><br>Ini wajar jika sedang dalam fase tanam dan belum panen. Kebocoran terbesar ada di pos <b>${maxCat}</b> (${formatRp(maxVal)}). Coba efisiensikan biaya di sektor tersebut.`;
         }
 
-        // Chart Bar Analisis (Top Pengeluaran)
         const ctx = document.getElementById('analisisChart').getContext('2d');
         if(aChart) aChart.destroy();
         aChart = new Chart(ctx, {
@@ -455,9 +541,9 @@
         });
     }
 
-    // --- FUNGSI VOICE (Web Speech API) ---
+    // --- FUNGSI VOICE ---
     function startVoiceBot() {
-        if (!('webkitSpeechRecognition' in window)) return alert('Gunakan Chrome untuk fitur suara.');
+        if (!('webkitSpeechRecognition' in window)) return alert('Gunakan browser Chrome untuk fitur suara.');
         const rec = new webkitSpeechRecognition();
         rec.lang = 'id-ID';
         rec.onstart = () => console.log('Mendengarkan...');
@@ -470,15 +556,23 @@
             if(angkaArr) {
                 let pengali = hasil.includes('juta') ? 1000000 : (hasil.includes('ribu') ? 1000 : 1);
                 document.getElementById('input-nominal').value = parseInt(angkaArr[0]) * pengali;
+                
+                if(angkaArr.length > 1) {
+                    const no2 = parseInt(angkaArr[1]);
+                    document.getElementById('input-berat').value = no2 < parseInt(angkaArr[0]) ? no2 : '';
+                }
             }
-            alert(`Sistem merekam: "${hasil}".\nCek form manual untuk menyimpan.`);
+            document.getElementById('input-catatan').value = hasil;
+            alert(`Sistem menangkap: "${hasil}".\nCek form manual untuk mengkonfirmasi penyimpanan.`);
         };
         rec.start();
     }
 
-    // Inisialisasi awal saat pertama buka
-    window.onload = () => { renderBeranda(); };
-
+    // Inisialisasi
+    window.onload = () => { 
+        renderBeranda(); 
+        setTodayDate(); 
+    };
 </script>
 </body>
 </html>
