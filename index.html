@@ -23,21 +23,26 @@
             --green: #2b7a5c;
             --orange: #e67e22;
             --bg-app: #eef3e6;
-            --primary-dark: #385d34;
-            --primary-light: #e4f0d9;
+
+            /* Warna Pemasukan / Surplus (Disinkronkan dengan Dashboard) */
+            --primary-dark: #2b7a5c; 
+            --primary-light: #e6f2ed; 
+            
+            /* Warna Pengeluaran / Minus (Disinkronkan dengan Dashboard) */
+            --expense-text: #e67e22; 
+            --expense-bg: #fdf5e6; 
+            --expense-border: #f3cda8; 
+            
             --text-dark: #1f291e;
             --text-muted: #6b726a;
             --white: #ffffff;
             --border-color: #d1d9ce;
-            --expense-bg: #faeaea;
-            --expense-text: #c0392b;
-            --expense-border: #e8a0a0;
             
             /* Form Style Khusus */
             --form-bg: #f5f8f4;
             --form-border: #c4d1c4;
             --form-label: #586958;
-            --btn-dark-green: #3b5f3b;
+            --btn-dark-green: #2b7a5c; 
         }
 
         * { box-sizing: border-box; font-family: 'Nunito', sans-serif; }
@@ -679,7 +684,7 @@
 
         aChart = new Chart(ctx, {
             type: 'bar',
-            data: { labels: Object.keys(outCategories), datasets: [{ label: 'Total Rp', data: Object.values(outCategories), backgroundColor: '#e8a0a0', borderRadius: 8 }] },
+            data: { labels: Object.keys(outCategories), datasets: [{ label: 'Total Rp', data: Object.values(outCategories), backgroundColor: '#e67e22', borderRadius: 8 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
