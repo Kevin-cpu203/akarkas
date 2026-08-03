@@ -1,399 +1,12 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <!-- Konfigurasi PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2b7a5c">
-    <link rel="apple-touch-icon" href="icon.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AkarKas - Buku Kas Digital</title>
-    
-    <!-- FontAwesome, Chart.js, & html2pdf.js -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Tambahan library untuk konversi PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            /* Tema Utama */
-            --teal: #17a2b8;
-            --green: #2b7a5c;
-            --orange: #e67e22;
-            --bg-app: #eef3e6;
-
-            /* Warna Pemasukan / Surplus (Disinkronkan dengan Dashboard) */
-            --primary-dark: #2b7a5c; 
-            --primary-light: #e6f2ed; 
-            
-            /* Warna Pengeluaran / Minus (Disinkronkan dengan Dashboard) */
-            --expense-text: #e67e22; 
-            --expense-bg: #fdf5e6; 
-            --expense-border: #f3cda8; 
-            
-            --text-dark: #1f291e;
-            --text-muted: #6b726a;
-            --white: #ffffff;
-            --border-color: #d1d9ce;
-            
-            /* Form Style Khusus */
-            --form-bg: #f5f8f4;
-            --form-border: #c4d1c4;
-            --form-label: #586958;
-            --btn-dark-green: #2b7a5c; 
-        }
-
-        * { box-sizing: border-box; font-family: 'Nunito', sans-serif; }
-        body { margin: 0; background-color: #dbe4d3; display: flex; justify-content: center; }
-
-        .app-container {
-            width: 100%; max-width: 480px; background-color: var(--bg-app);
-            min-height: 100vh; position: relative; overflow-x: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-
-        /* --- GLOBAL HEADER --- */
-        .global-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
-            background: var(--white); border-bottom: 1px solid var(--border-color);
-            position: sticky; top: 0; z-index: 1000;
-        }
-        .global-title-box { display: flex; align-items: center; gap: 10px; }
-        .global-title-box img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
-        .global-title-text { display: flex; flex-direction: column; }
-        .global-title-text h2 { margin: 0; font-size: 15px; font-weight: 800; color: var(--text-dark); }
-        .global-title-text p { margin: 2px 0 0 0; font-size: 10px; color: var(--text-muted); font-weight: 600;}
-        
-        .header-actions { display: flex; gap: 8px; }
-        .btn-entri { background: var(--green); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .btn-share { background: var(--teal); color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-        .btn-share:disabled { background: #95a5a6; cursor: not-allowed; }
-
-        .page-title { padding: 20px 20px 5px 20px; color: var(--text-dark); font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin: 0; }
-
-        /* --- SISTEM NAVIGASI --- */
-        .view-section { display: none; padding-bottom: 120px; animation: fadeIn 0.3s; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .floating-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: calc(100% - 40px); max-width: 440px;
-            background: var(--white); border-radius: 24px;
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            padding: 10px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); z-index: 1000;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 10px 0; color: var(--text-muted); font-size: 11px; font-weight: 700; gap: 6px;
-            cursor: pointer; border-radius: 18px; transition: 0.2s;
-        }
-        .nav-item i { font-size: 20px; }
-        .nav-item.active { background-color: var(--primary-light); color: var(--primary-dark); }
-
-        /* --- BERANDA --- */
-        .filter-bar { display: flex; gap: 10px; padding: 15px 20px; }
-        .filter-select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: var(--white); color: var(--text-muted); font-weight: 600; font-size: 13px; }
-
-        .dashboard-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px 20px 20px; }
-        .card-full { grid-column: span 2; }
-        .d-card { padding: 18px 15px; border-radius: 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .d-card h4 { margin: 0; font-size: 12px; font-weight: 600; opacity: 0.9; }
-        .d-card h2 { margin: 5px 0 0 0; font-size: 22px; font-weight: 800; }
-        .d-card i { position: absolute; top: 15px; right: 15px; font-size: 24px; opacity: 0.3; }
-        .bg-teal { background: linear-gradient(135deg, #20b2aa, var(--teal)); }
-        .bg-green { background: linear-gradient(135deg, #3498db, var(--green)); }
-        .bg-orange { background: linear-gradient(135deg, #f39c12, var(--orange)); }
-
-        .chart-box { background: white; margin: 0 20px; padding: 20px; border-radius: 15px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .chart-box h3 { text-align: left; margin-top: 0; font-size: 15px; color: var(--text-dark); }
-        
-        .donut-wrapper { position: relative; height: 200px; width: 100%; display: flex; align-items: center; justify-content: center; }
-        .donut-container { width: 100%; height: 100%; position: absolute; z-index: 1; }
-        .chart-center-text { position: absolute; z-index: 2; text-align: center; pointer-events: none; }
-        .chart-center-text p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .chart-center-text h3 { margin: 0; font-size: 18px; color: var(--text-dark); font-weight: 800; }
-
-        /* --- CATAT --- */
-        .c-card { background: var(--white); border-radius: 24px; padding: 25px 20px; margin: 15px 20px 20px 20px; }
-        .mic-btn { width: 90px; height: 90px; background: var(--primary-dark); color: white; border: none; border-radius: 50%; font-size: 32px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 16px rgba(56, 93, 52, 0.3); }
-        
-        .type-toggles { display: flex; gap: 15px; margin-bottom: 25px; }
-        .toggle-btn { flex: 1; padding: 15px 10px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
-        .toggle-btn.active-in { border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-light); }
-        .toggle-btn.active-out { border-color: var(--expense-border); color: var(--expense-text); background: var(--expense-bg); }
-        
-        .category-pills { display: flex; flex-wrap: wrap; gap: 10px; }
-        .pill { padding: 8px 16px; background: var(--bg-app); border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .pill.active { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-dark); }
-        
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--form-label); }
-        .form-control { width: 100%; padding: 14px 16px; border: 1px solid var(--form-border); border-radius: 12px; font-size: 16px; background-color: var(--form-bg); color: var(--text-dark); font-family: monospace; }
-        .form-control::placeholder { color: #a3b1a3; font-family: 'Nunito', sans-serif; }
-        .form-control:focus { outline: none; border-color: var(--primary-dark); }
-        textarea.form-control { font-family: 'Nunito', sans-serif; resize: vertical; min-height: 80px; }
-        
-        .btn-submit { width: 100%; padding: 16px; background: var(--btn-dark-green); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(59, 95, 59, 0.2); transition: 0.2s; }
-        .btn-submit:active { transform: scale(0.98); }
-
-        /* --- RIWAYAT --- */
-        .list-container { padding: 0 20px; margin-top: 10px;}
-        .filter-riwayat { display: flex; gap: 10px; padding: 15px 20px; }
-        .filter-btn { flex: 1; padding: 10px 5px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--white); color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .filter-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
-        
-        .tx-item { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .tx-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 18px; margin-right: 15px; }
-        .i-in { background: var(--primary-light); color: var(--primary-dark); }
-        .i-out { background: var(--expense-bg); color: var(--expense-text); }
-        .tx-details { flex: 1; }
-        .tx-details h4 { margin: 0; font-size: 14px; color: var(--text-dark); }
-        .tx-details p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted); }
-        .tx-amount { text-align: right; }
-        .action-btns { display: flex; justify-content: flex-end; margin-top: 5px; gap: 8px; }
-        .btn-edit { color: #f39c12; background: #fdf5e6; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .btn-del { color: #e74c3c; background: #faeaea; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-
-        /* MODAL EDIT */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end; }
-        .modal-content { background: var(--bg-app); width: 100%; max-width: 480px; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 25px 20px; animation: slideUp 0.3s; max-height: 90vh; overflow-y: auto; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { margin: 0; font-size: 18px; color: var(--text-dark); }
-        .btn-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-
-        /* --- ANALISIS --- */
-        .analisis-card { background: white; padding: 25px 20px; border-radius: 24px; margin: 15px 20px 20px 20px; text-align: center; }
-        .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 800; font-size: 18px; margin-bottom: 15px; }
-        .status-surplus { background: var(--primary-light); color: var(--primary-dark); }
-        .status-minus { background: var(--expense-bg); color: var(--expense-text); }
-        .analisis-text { font-size: 14px; color: var(--text-dark); line-height: 1.6; text-align: left; padding: 15px; background: var(--bg-app); border-radius: 12px; }
-        .bar-container { height: 200px; margin-top: 20px; }
-    </style>
-</head>
-<body>
-
-<div class="app-container">
-
-    <!-- ==================== GLOBAL HEADER ==================== -->
-    <div class="global-header">
-        <div class="global-title-box">
-            <img src="icon.png" alt="Logo">
-            <div class="global-title-text">
-                <h2>AkarKas- Buku Kas Digital</h2>
-                <p>Pencatatan keuangan greenhouse</p>
-            </div>
-        </div>
-        <div class="header-actions">
-            <button class="btn-share" onclick="unduhLaporanPDF(this)"><i class="fa-solid fa-download"></i> Bagikan</button>
-            <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
-        </div>
-    </div>
-
-    <!-- ==================== MENU 1: BERANDA ==================== -->
-    <div id="view-beranda" class="view-section active">
-        
-        <div class="filter-bar">
-            <select class="filter-select">
-                <option value="1">Januari</option>
-                <option value="2">Februari</option>
-                <option value="3">Maret</option>
-                <option value="4">April</option>
-                <option value="5">Mei</option>
-                <option value="6">Juni</option>
-                <option value="7" selected>Juli</option>
-                <option value="8">Agustus</option>
-                <option value="9">September</option>
-                <option value="10">Oktober</option>
-                <option value="11">November</option>
-                <option value="12">Desember</option>
-            </select>
-            <select class="filter-select">
-                <option>Semua Kategori</option>
-                <option>Pemasukan</option>
-                <option>Pengeluaran</option>
-                <option>Penjualan</option>
-            </select>
-        </div>
-
-        <div class="dashboard-cards">
-            <div class="d-card bg-teal card-full">
-                <i class="fa-solid fa-wallet"></i>
-                <h4>Total Saldo</h4>
-                <h2 id="b-saldo">Rp 0</h2>
-            </div>
-            <div class="d-card bg-green">
-                <i class="fa-solid fa-arrow-trend-up"></i>
-                <h4>Pemasukan</h4>
-                <h2 id="b-in">Rp 0</h2>
-            </div>
-            <div class="d-card bg-orange">
-                <i class="fa-solid fa-arrow-trend-down"></i>
-                <h4>Pengeluaran</h4>
-                <h2 id="b-out">Rp 0</h2>
-            </div>
-        </div>
-
-        <div class="chart-box">
-            <h3>Pemasukan vs Pengeluaran <span style="float:right; color:#ccc;"><i class="fa-solid fa-clock-rotate-left"></i></span></h3>
-            <div class="donut-wrapper">
-                <div class="donut-container">
-                    <canvas id="berandaChart"></canvas>
-                </div>
-                <div class="chart-center-text">
-                    <p>Saldo Netto</p>
-                    <h3 id="chart-center-saldo">Rp 0</h3>
-                </div>
-            </div>
-            <div style="font-size:12px; margin-top:15px; font-weight:700;">
-                <span style="color:var(--green)"><i class="fa-solid fa-circle"></i> Pemasukan</span> &nbsp;&nbsp; 
-                <span style="color:var(--orange)"><i class="fa-solid fa-circle"></i> Pengeluaran</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== MENU 2: CATAT ==================== -->
-    <div id="view-catat" class="view-section">
-        <h2 class="page-title"><i class="fa-solid fa-seedling" style="color:var(--green);"></i> Pencatatan Baru</h2>
-
-        <div class="c-card" style="text-align: center;">
-            <div style="text-align:left; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-volume-high"></i> Catat dengan Suara</div>
-            <button class="mic-btn" onclick="startVoiceBot()"><i class="fa-solid fa-microphone"></i></button>
-            <h3 style="margin:0 0 10px 0; font-size:16px;">Ketuk untuk mulai bicara</h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.5;">Contoh: "Beli pupuk AB Mix 500 ribu"<br>atau "Jual melon 3 kilo harga 50 ribu"</p>
-        </div>
-
-        <div style="text-align: center; margin-bottom: 20px; color: var(--text-muted); font-size: 14px;">--- atau isi manual ---</div>
-
-        <div class="c-card">
-            <div class="type-toggles">
-                <button class="toggle-btn" id="btn-in" onclick="setJenis('pemasukan')"><i class="fa-solid fa-arrow-up-right-dots"></i> Pemasukan</button>
-                <button class="toggle-btn active-out" id="btn-out" onclick="setJenis('pengeluaran')"><i class="fa-solid fa-arrow-down-right-dots"></i> Pengeluaran</button>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 25px;">
-                <label style="margin-bottom: 10px; display:block;">Pilih Kategori</label>
-                <input type="hidden" id="input-kategori">
-                <div class="category-pills" id="kategori-container">
-                    <!-- Dimuat dari Javascript -->
-                </div>
-                <input type="text" id="input-kategori-lainnya" class="form-control" style="display:none; margin-top:10px;" placeholder="Ketik rincian kategori di sini...">
-            </div>
-
-            <div class="form-group">
-                <label>Jumlah (Rp)</label>
-                <input type="number" id="input-nominal" class="form-control" placeholder="0">
-            </div>
-            
-            <div class="form-group" id="group-berat" style="display:none;">
-                <label>Berat Melon (kg)</label>
-                <input type="number" id="input-berat" class="form-control" placeholder="misal: 300">
-            </div>
-
-            <div class="form-group">
-                <label>Tanggal</label>
-                <input type="date" id="input-tanggal" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label>Catatan (opsional)</label>
-                <textarea id="input-catatan" class="form-control"></textarea>
-            </div>
-
-            <button class="btn-submit" onclick="simpanManual()"><i class="fa-solid fa-plus"></i> Simpan Transaksi</button>
-        </div>
-    </div>
-
-    <!-- ==================== MENU 3: RIWAYAT ==================== -->
-    <div id="view-riwayat" class="view-section">
-        <h2 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi</h2>
-        
-        <div class="filter-riwayat">
-            <button class="filter-btn active" id="filter-semua" onclick="filterRiwayat('semua')">Semua</button>
-            <button class="filter-btn" id="filter-in" onclick="filterRiwayat('pemasukan')">Pemasukan</button>
-            <button class="filter-btn" id="filter-out" onclick="filterRiwayat('pengeluaran')">Pengeluaran</button>
-        </div>
-
-        <div class="list-container" id="riwayat-list">
-            <!-- Data riwayat masuk ke sini -->
-        </div>
-    </div>
-
-    <!-- ==================== MENU 4: ANALISIS ==================== -->
-    <div id="view-analisis" class="view-section">
-        <h2 class="page-title"><i class="fa-solid fa-chart-line"></i> Analisis Keuangan</h2>
-        
-        <div class="analisis-card">
-            <h4 style="margin:0 0 10px 0; color:var(--text-muted);">Status Bulan Ini</h4>
-            <div id="status-badge" class="status-badge status-surplus">SURPLUS</div>
-            
-            <div class="analisis-text" id="teks-analisis">Memuat analisis...</div>
-            
-            <h4 style="margin:25px 0 10px 0; text-align:left;">Grafik Kategori Pengeluaran</h4>
-            <div class="bar-container">
-                <canvas id="analisisChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== MODAL EDIT ==================== -->
-    <div class="modal-overlay" id="modal-edit">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-pen"></i> Edit Transaksi</h3>
-                <button class="btn-close" onclick="tutupEdit()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <input type="hidden" id="edit-id">
-            
-            <div class="form-group">
-                <label>Kategori</label>
-                <input type="text" id="edit-kategori" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Jumlah (Rp)</label>
-                <input type="number" id="edit-nominal" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Berat Melon (kg)</label>
-                <input type="number" id="edit-berat" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Tanggal</label>
-                <input type="date" id="edit-tanggal" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Catatan</label>
-                <textarea id="edit-catatan" class="form-control"></textarea>
-            </div>
-            <button class="btn-submit" onclick="simpanEdit()">Simpan Perubahan</button>
-        </div>
-    </div>
-
-    <!-- ==================== FLOATING NAV ==================== -->
-    <div class="floating-nav">
-        <div class="nav-item active" onclick="switchTab('view-beranda', this)">
-            <i class="fa-solid fa-house"></i><span>Beranda</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('view-catat', this)">
-            <i class="fa-solid fa-clipboard-list"></i><span>Catat</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('view-riwayat', this)">
-            <i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('view-analisis', this)">
-            <i class="fa-solid fa-chart-pie"></i><span>Analisis</span>
-        </div>
-    </div>
-
-</div>
-
 <script>
-    // --- DATABASE DIKOSONGKAN (Mulai dari Nol) ---
-    let transaksi = [];
+    // --- DATABASE (Disimpan secara permanen di memori HP) ---
+    // Mengambil data dari Local Storage, jika kosong maka gunakan []
+    let transaksi = JSON.parse(localStorage.getItem('data_akarkas')) || [];
+
+    // Fungsi baru untuk menyimpan perubahan ke HP
+    function simpanKeLokal() {
+        localStorage.setItem('data_akarkas', JSON.stringify(transaksi));
+    }
 
     let jenisAktif = 'pengeluaran';
     let filterSaatIni = 'semua';
@@ -539,6 +152,9 @@
             catatan: document.getElementById('input-catatan').value
         });
         
+        // Simpan ke memori HP
+        simpanKeLokal();
+        
         document.getElementById('input-nominal').value = '';
         document.getElementById('input-berat').value = '';
         document.getElementById('input-catatan').value = '';
@@ -629,6 +245,9 @@
             transaksi[index].tanggal = document.getElementById('edit-tanggal').value;
             transaksi[index].catatan = document.getElementById('edit-catatan').value;
 
+            // Simpan pembaruan ke memori HP
+            simpanKeLokal();
+
             tutupEdit();
             renderRiwayat();
             alert("Perubahan berhasil disimpan!");
@@ -638,6 +257,10 @@
     function hapusTx(id) {
         if(confirm('Yakin ingin menghapus transaksi ini?')) {
             transaksi = transaksi.filter(t => t.id !== id);
+            
+            // Simpan penghapusan ke memori HP
+            simpanKeLokal();
+            
             renderRiwayat();
         }
     }
@@ -821,10 +444,8 @@
         setTodayDate();
         setJenis('pengeluaran'); 
     };
-</script>
 
-<!-- Mendaftarkan Service Worker PWA -->
-<script>
+    // Mendaftarkan Service Worker PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -833,6 +454,3 @@
         });
     }
 </script>
-
-</body>
-</html>
