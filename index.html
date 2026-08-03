@@ -841,15 +841,6 @@
         setJenis('pengeluaran'); 
     };
 
-    // Mendaftarkan Service Worker PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker berhasil didaftarkan!', reg.scope))
-                .catch(err => console.error('Service Worker gagal didaftarkan', err));
-        });
-    }
-</script>
     // --- FITUR TOMBOL INSTAL PWA MANUAL ---
     let pemancingInstalasi;
     const tombolInstal = document.getElementById('btn-install');
@@ -873,16 +864,6 @@
     });
 
     // Mendaftarkan Service Worker PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker berhasil didaftarkan!', reg.scope))
-                .catch(err => console.error('Service Worker gagal didaftarkan', err));
-        });
-    }
-</script>
-<!-- Mendaftarkan Service Worker PWA -->
-<script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
