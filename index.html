@@ -188,6 +188,9 @@
             </div>
         </div>
         <div class="header-actions">
+            <!-- Tombol Instal Baru (Tersembunyi secara default) -->
+            <button id="btn-install" class="btn-share" style="display: none; background: #e67e22;"><i class="fa-solid fa-mobile-screen"></i> Instal</button>
+            
             <button class="btn-share" onclick="unduhLaporanPDF(this)"><i class="fa-solid fa-download"></i> Bagikan</button>
             <button class="btn-entri" onclick="switchTab('view-catat')"><i class="fa-solid fa-plus"></i> Entri</button>
         </div>
@@ -847,7 +850,37 @@
         });
     }
 </script>
+    // --- FITUR TOMBOL INSTAL PWA MANUAL ---
+    let pemancingInstalasi;
+    const tombolInstal = document.getElementById('btn-install');
 
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); 
+        pemancingInstalasi = e; 
+        tombolInstal.style.display = 'block'; 
+    });
+
+    tombolInstal.addEventListener('click', async () => {
+        if (pemancingInstalasi) {
+            pemancingInstalasi.prompt(); 
+            const { outcome } = await pemancingInstalasi.userChoice;
+            if (outcome === 'accepted') {
+                console.log('Pengguna menginstal AkarKas');
+                tombolInstal.style.display = 'none'; 
+            }
+            pemancingInstalasi = null;
+        }
+    });
+
+    // Mendaftarkan Service Worker PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker berhasil didaftarkan!', reg.scope))
+                .catch(err => console.error('Service Worker gagal didaftarkan', err));
+        });
+    }
+</script>
 <!-- Mendaftarkan Service Worker PWA -->
 <script>
     if ('serviceWorker' in navigator) {
