@@ -392,8 +392,14 @@
 </div>
 
 <script>
-    // --- DATABASE DIKOSONGKAN (Mulai dari Nol) ---
-    let transaksi = [];
+    // --- DATABASE (Disimpan secara permanen di memori HP) ---
+    // Mengambil data dari Local Storage, jika kosong maka gunakan []
+    let transaksi = JSON.parse(localStorage.getItem('data_akarkas')) || [];
+
+    // Fungsi baru untuk menyimpan perubahan ke HP
+    function simpanKeLokal() {
+        localStorage.setItem('data_akarkas', JSON.stringify(transaksi));
+    }
 
     let jenisAktif = 'pengeluaran';
     let filterSaatIni = 'semua';
@@ -539,6 +545,9 @@
             catatan: document.getElementById('input-catatan').value
         });
         
+        // Simpan ke memori HP
+        simpanKeLokal();
+        
         document.getElementById('input-nominal').value = '';
         document.getElementById('input-berat').value = '';
         document.getElementById('input-catatan').value = '';
@@ -629,6 +638,9 @@
             transaksi[index].tanggal = document.getElementById('edit-tanggal').value;
             transaksi[index].catatan = document.getElementById('edit-catatan').value;
 
+            // Simpan pembaruan ke memori HP
+            simpanKeLokal();
+
             tutupEdit();
             renderRiwayat();
             alert("Perubahan berhasil disimpan!");
@@ -638,6 +650,10 @@
     function hapusTx(id) {
         if(confirm('Yakin ingin menghapus transaksi ini?')) {
             transaksi = transaksi.filter(t => t.id !== id);
+            
+            // Simpan penghapusan ke memori HP
+            simpanKeLokal();
+            
             renderRiwayat();
         }
     }
@@ -821,6 +837,15 @@
         setTodayDate();
         setJenis('pengeluaran'); 
     };
+
+    // Mendaftarkan Service Worker PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker berhasil didaftarkan!', reg.scope))
+                .catch(err => console.error('Service Worker gagal didaftarkan', err));
+        });
+    }
 </script>
 
 <!-- Mendaftarkan Service Worker PWA -->
